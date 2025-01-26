@@ -13,14 +13,14 @@ import json
 import pandas as pd
 
 # Authorization header with your Bearer token (v4 auth)
-api_key = "de8d7fcb94be031986259192b4fdfb0"
+api_key = "d3e8d7fcb94be031986259192b4fdfb0"
 # Base URL and endpoint for TMDB
 url = f"https://api.themoviedb.org/3/configuration?api_key-{api_key}"
 
 # Make the GET request
 response = requests.get(url)
 response #console should show <Response [200]>
-# use this url in browser: https://api.themoviedb.org/3/configuration?api_key=de8d7fcb94be031986259192b4fdfb0
+# use this url in browser: https://api.themoviedb.org/3/configuration?api_key=d3e8d7fcb94be031986259192b4fdfb0
 
 # Check the response status
 if response.status_code == 200:
