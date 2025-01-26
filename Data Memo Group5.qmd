@@ -36,7 +36,6 @@ else:
   print(response.text)
 ```
 
-
 ## Research Question(s)
 
 1.  **Objective: What are we trying to predict?**
@@ -68,5 +67,7 @@ The model serves both descriptive and predictive purposes:
 -   **Predictive**: To generate personalized recommendations for users based on their inputs, applying TMDB’s API and advanced text similarity measures.
 
 ## Proposed Project Timeline
+
+We plan on having the data set loaded in by February 8th, tidy data by February 16th, and the explanatory analysis by February 28th. From then on, we plan on running models by March 8th, write-ups by March 12, edits and final draft by March 16th.
 
 ## Questions or Concerns
