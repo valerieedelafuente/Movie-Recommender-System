@@ -13,7 +13,7 @@ import json
 import pandas as pd
 
 # Authorization header with your Bearer token (v4 auth)
-api_key = "dd3e8d7fcb94be031986259192b4fdfb0"
+api_key = "de8d7fcb94be031986259192b4fdfb0"
 # Base URL and endpoint for TMDB
 url = f"https://api.themoviedb.org/3/configuration?api_key-{api_key}"
 
