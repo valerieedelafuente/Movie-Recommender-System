@@ -79,3 +79,5 @@ The model serves both descriptive and predictive purposes:
 We plan on having the data set loaded in by February 8th, tidy data by February 16th, and the explanatory analysis by February 28th. From then on, we plan on running models by March 8th, write-ups by March 12, edits and final draft by March 16th.
 
 ## Questions or Concerns
+
+The parts of this project that we anticipate to be difficult are the implementation of the recommender system, and making sure that it is able to recommend well based on the information that it is given. Working through the weeds of making sure our API is working and then being able to transform that data into a recommender will probably be one of the more difficult parts of the project. One potential problem that we anticipate is that the data we retrieved with our API will not be enough information to give a good movie recommendation, but so far it looks like there is a lot of good information on the movies that we can work with. There are no questions for the instructional team right now, but as they come up, we will be sure to reach out.
