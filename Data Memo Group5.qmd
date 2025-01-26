@@ -12,6 +12,29 @@ import requests
 import json
 import pandas as pd
 
+# Base URL and endpoint for TMDB
+url = "https://api.themoviedb.org"
+
+# Authorization header with your Bearer token (v4 auth)
+headers = {
+    "Authorization": "Bearer d3e8d7fcb94be031986259192b4fdfb0"
+}
+
+# Make the GET request
+response = requests.get(url, headers=headers)
+
+# Check the response status
+if response.status_code == 200:
+    # Parse JSON response
+    data = response.json()
+    
+    # Convert results to a Pandas DataFrame
+    movies_df = pd.DataFrame(data['results'])
+    print(movies_df.head())  # Display the first few rows of the DataFrame
+else:
+    # Print the error message
+    print(f"Error: {response.status_code}")
+    print(response.text)
 
 ```
 
