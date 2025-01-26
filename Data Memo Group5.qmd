@@ -30,7 +30,7 @@ if response.status_code == 200:
     data = response.json()  
     movies = data["results"]  
     movies_df = pd.DataFrame(movies)
-    print(df)
+    print(movies_df)
 
 else:
     print("Error", response.status_code)
