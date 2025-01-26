@@ -7,6 +7,14 @@ author: Valerie De La Fuente, Leslie Cervantes Rivera, Tess Ivinjack, Jiajia Fen
 
 ## Overview of Dataset
 
+```{python}
+import requests
+import json
+import pandas as pd
+
+
+```
+
 ## Research Question(s)
 
 1.  **Objective: What are we trying to predict?**
