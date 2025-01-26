@@ -2,7 +2,7 @@
 title: "Data Memo Group5"
 format: html
 editor: visual
-#author: 
+author: Valerie De La Fuente, Leslie Cervantes Rivera, Tess Ivinjack, Jiajia Feng
 ---
 
 ## Overview of Dataset
