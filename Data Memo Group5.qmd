@@ -22,19 +22,14 @@ response = requests.get(url)
 response #console should show <Response [200]>
 # use this url in browser: https://api.themoviedb.org/3/configuration?api_key=d3e8d7fcb94be031986259192b4fdfb0
 
-# Check the response status
+# If the response is successful, you can convert it to JSON
 if response.status_code == 200:
-  # Parse JSON response
-  data = response.json()
-  
-  # Convert results to a Pandas DataFrame
-  movies_df = pd.DataFrame(data['results'])
-  print(movies_df.head()) # Display the first few rows of the DataFrame
+    data = response.json()
+    print(json.dumps(data, indent=4))  # pretty print the JSON response
 else:
-  # Print the error message
-  print (f"Error: {response.status_code}")
-  print(response.text)
+    print("Error:", response.status_code)
 ```
+
 
 ## Research Question(s)
 
