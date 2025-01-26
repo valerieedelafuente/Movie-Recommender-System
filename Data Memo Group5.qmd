@@ -15,7 +15,7 @@ import pandas as pd
 # Authorization header with your Bearer token (v4 auth)
 api_key = "d3e8d7fcb94be031986259192b4fdfb0"
 # Base URL and endpoint for TMDB
-url = f"https://api.themoviedb.org/3/configuration?api_key-{api_key}"
+url = f"https://api.themoviedb.org/3/configuration?api_key={api_key}"
 
 # Make the GET request
 response = requests.get(url)
