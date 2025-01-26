@@ -9,27 +9,40 @@ author: Valerie De La Fuente, Leslie Cervantes Rivera, Tess Ivinjack, Jiajia Fen
 
 ```{python}
 import requests
-import json
 import pandas as pd
 
-# Authorization header with your Bearer token (v4 auth)
 api_key = "d3e8d7fcb94be031986259192b4fdfb0"
-# Base URL and endpoint for TMDB
-url = f"https://api.themoviedb.org/3/configuration?api_key={api_key}"
 
-# Make the GET request
-response = requests.get(url)
-response #console should show <Response [200]>
-# use this url in browser: https://api.themoviedb.org/3/configuration?api_key=d3e8d7fcb94be031986259192b4fdfb0
+# Base URL for the TMDb popular movies endpoint
+url = "https://api.themoviedb.org/3/movie/popular"
 
-# If the response is successful, you can convert it to JSON
+# Set parameters like the page number and API key
+parameters = {
+    "api_key": api_key,
+    "page":1
+}
+
+# Make the GET request to fetch the data
+response = requests.get(url, params=parameters)
+
+# Check if the request was successful
 if response.status_code == 200:
-    data = response.json()
-    print(json.dumps(data, indent=4))  # pretty print the JSON response
+    data = response.json()  
+    movies = data["results"]  
+    movies_df = pd.DataFrame(movies)
+    print(df)
+
 else:
-    print("Error:", response.status_code)
+    print("Error", response.status_code)
+
+# Checking for missing data
+missing_data = movies_df.isnull().sum()
+print(missing_data)
 ```
 
+We are accessing data from The Movie Database (TMDb) API. The main website is https://www.themoviedb.org/. To access the API, we created an account through the main website and requested a key under the settings for the account. We aim to use the data given by this API to create a movie recommender system.
+
+The output of the code above is a dataframe that contains predictors from the `change_keys` array and `images` objects. We will be using these predictors to extract movie information while changing endpoints to adjust for new/more information as needed. These types of variables include movie information of all types. We will be using variables related to the viewer and to the movies themselves. As we explore the API more, we will have definitive predictors that we will be using .There are 20 results/observations per page and we will be adjusting the amount of pages for more observations. From the output above, we can see that there is no missing data to be handled.
 
 ## Research Question(s)
 
