@@ -8,6 +8,34 @@ editor: visual
 
 ## Research Question(s)
 
+1.  **Objective: What are we trying to predict?**
+
+The primary goal of our project is to predict a dynamic list of movies tailored to users’ preferences. By analyzing user input (e.g., selected movies or genres), the system will identify and rank similar movies based on key metadata such as genres, descriptions, and ratings. This enables a personalized movie discovery experience.
+
+2.  **Factors Driving Recommendations**
+
+-   **Genres**: Movies sharing similar genres are often perceived as related, making this a crucial factor in building recommendations.
+
+-   **Overview (Descriptions)**: Similarities in movie synopses, captured using text analysis techniques like TF-IDF.
+
+-   **Ratings**: Moviegoers ratings provide an important measure of overall movie quality and popularity.
+
+-   **Keywords**: Metadata keywords from TMDB reveal connections between movies through shared themes or features.
+
+3.  **Research Questions**
+
+-   How can we recommend movies that align with users’ preferences effectively?
+-   What factors (e.g., genres, ratings, or popularity) contribute most to determining relevant recommendations?
+-   How does similarity in movie metadata (e.g., overview or genre) influence the quality of recommendations?
+
+4.  **Model Purpose**
+
+The model serves both descriptive and predictive purposes:
+
+-   **Descriptive**: To analyze patterns in movie metadata and understand the underlying relationships between movies that drive similarity.
+
+-   **Predictive**: To generate personalized recommendations for users based on their inputs, applying TMDB’s API and advanced text similarity measures.
+
 ## Proposed Project Timeline
 
 ## Questions or Concerns
