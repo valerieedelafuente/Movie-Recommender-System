@@ -1,5 +1,5 @@
 ---
-title: "Data Memo Group5"
+title: "Data Memo Group 5"
 format: html
 editor: visual
 author: Valerie De La Fuente, Leslie Cervantes Rivera, Tess Ivinjack, Jiajia Feng
@@ -42,7 +42,9 @@ print(missing_data)
 
 We are accessing data from The Movie Database (TMDb) API. The main website is https://www.themoviedb.org/. To access the API, we created an account through the main website and requested a key under the settings for the account. We aim to use the data given by this API to create a movie recommender system.
 
-The output of the code above is a dataframe that contains predictors from the `change_keys` array and `images` objects. We will be using these predictors to extract movie information while changing endpoints to adjust for new/more information as needed. These types of variables include movie information of all types. We will be using variables related to the viewer and to the movies themselves. As we explore the API more, we will have definitive predictors that we will be using .There are 20 results/observations per page and we will be adjusting the amount of pages for more observations. From the output above, we can see that there is no missing data to be handled.
+The output of the code above is a data frame that contains predictors from the `change_keys` array and `images` objects for one page. There appear to be 20 results/observations per page and we will be adjusting the amount of pages for more observations. For the free plan that we currently have, we are restricted to 40 requests per 10 seconds per IP. Additionally, we can see from the output that there is no missing data to be handled.
+
+We will be using these predictors to extract movie information while changing endpoints to adjust for new/more information as needed. These types of variables include movie information of all types. We will be using variables related to the viewer and to the movies themselves. As we explore the API more, we will have definitive predictors that we will be using.
 
 ## Research Question(s)
 
