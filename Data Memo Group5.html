@@ -2,12 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.553">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Valerie De La Fuente, Leslie Cervantes Rivera, Tess Ivinjack, Jiajia Feng">
 
-<title>Data Memo Group5</title>
+<title>Data Memo Group 5</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -45,25 +80,190 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Data Memo Group5</h1>
+<h1 class="title">Data Memo Group 5</h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Valerie De La Fuente, Leslie Cervantes Rivera, Tess Ivinjack, Jiajia Feng </p>
+          </div>
+  </div>
     
   
     
   </div>
   
 
-
 </header>
-
 
 <section id="overview-of-dataset" class="level2">
 <h2 class="anchored" data-anchor-id="overview-of-dataset">Overview of Dataset</h2>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>api_key <span class="op">=</span> <span class="st">"d3e8d7fcb94be031986259192b4fdfb0"</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Base URL for the TMDb popular movies endpoint</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">"https://api.themoviedb.org/3/movie/popular"</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Set parameters like the page number and API key</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>parameters <span class="op">=</span> {</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"api_key"</span>: api_key,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"page"</span>:<span class="dv">1</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Make the GET request to fetch the data</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> requests.get(url, params<span class="op">=</span>parameters)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if the request was successful</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> response.status_code <span class="op">==</span> <span class="dv">200</span>:</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> response.json()  </span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    movies <span class="op">=</span> data[<span class="st">"results"</span>] </span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    movies_df <span class="op">=</span> pd.DataFrame(movies)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(movies_df)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Error"</span>, response.status_code)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Checking for missing data</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>missing_data <span class="op">=</span> movies_df.isnull().<span class="bu">sum</span>()</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(missing_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    adult                     backdrop_path                  genre_ids  \
+0   False  /b85bJfrTOSJ7M5Ox0yp4lxIxdG1.jpg       [28, 878, 35, 10751]   
+1   False  /v9Du2HC3hlknAvGlWhquRbeifwW.jpg      [28, 878, 12, 14, 53]   
+2   False  /xZm5YUNY3PlYD1Q4k7X8zd2V4AK.jpg                   [28, 35]   
+3   False  /fYnEbgoNCxW9kL0IgOgtJb9JTBU.jpg                       [27]   
+4   False  /oHPoF0Gzu8xwK4CtdXDaWdcuZxZ.jpg            [12, 10751, 16]   
+5   False  /vYqt6kb4lcF8wwqsMMaULkP9OEn.jpg  [16, 12, 10751, 35, 9648]   
+6   False  /hAQnXxOwCjgYcKRgTdYPRC8neqL.jpg                   [28, 18]   
+7   False  /euYIwmwkmz95mnXvufEmbL6ovhZ.jpg               [28, 12, 18]   
+8   False  /vZG7PrX9HmdgL5qfZRjhJsFYEIA.jpg              [28, 878, 12]   
+9   False  /dhz2z8KpD5qd787CkEwPLo6rWpf.jpg               [28, 80, 53]   
+10  False  /pqulyfkug9A7TmmRn5zrbRA8TAY.jpg                   [28, 35]   
+11  False  /fzjH7kt1017R9EckLDmWmH5pGhD.jpg               [28, 27, 53]   
+12  False  /uOQgMhYyu7dkXdHoRkCqZIF32M6.jpg                   [28, 12]   
+13  False  /uKb22E0nlzr914bA9KyA5CVCOlV.jpg            [18, 10749, 14]   
+14  False  /7h6TqPB3ESmjuVbxCxAeB1c9OB1.jpg                  [27, 878]   
+15  False  /5o4iH2N4jX3HmNCBbC6rJqxtWj2.jpg                   [27, 53]   
+16  False  /3WnoZw50qIfXsFnKr0LddEh5Jnf.jpg            [10752, 36, 18]   
+17  False  /i3e7uwZOXks3PMvTOf4yQXbNxkI.jpg                   [28, 53]   
+18  False  /k24eZq5I3jyz4htPkZCRpnUmBzE.jpg                [10749, 18]   
+19  False  /cjEcqdRdPQJhYre3HUAc5538Gk8.jpg               [28, 14, 35]   
+
+         id original_language         original_title  \
+0    939243                en   Sonic the Hedgehog 3   
+1    539972                en      Kraven the Hunter   
+2    993710                en         Back in Action   
+3    426063                en              Nosferatu   
+4    762509                en  Mufasa: The Lion King   
+5   1241982                en                Moana 2   
+6    811941                te           దేవర: Part 1   
+7    558449                en           Gladiator II   
+8    912649                en  Venom: The Last Dance   
+9   1249289                en                 Alarum   
+10  1255788                fr           Le Jardinier   
+11   970450                en             Werewolves   
+12  1241320                ja           キングダム　大将軍の帰還   
+13   402431                en                 Wicked   
+14   933260                en          The Substance   
+15  1222064                en         River of Blood   
+16  1222248                no                 Nr. 24   
+17  1081012                en              Aftermath   
+18  1156593                es             Culpa tuya   
+19   845781                en                Red One   
+
+                                             overview  popularity  \
+0   Sonic, Knuckles, and Tails reunite against a p...    7240.445   
+1   Kraven Kravinoff's complex relationship with h...    3492.623   
+2   Fifteen years after vanishing from the CIA to ...    3242.233   
+3   A gothic tale of obsession between a haunted y...    2664.109   
+4   Mufasa, a cub lost and alone, meets a sympathe...    1875.291   
+5   After receiving an unexpected call from her wa...    1596.049   
+6   Devara, a fearless man from a coastal region, ...    1463.846   
+7   Years after witnessing the death of the revere...    1320.084   
+8   Eddie and Venom are on the run. Hunted by both...    1279.040   
+9   Two married spies caught in the crosshairs of ...    1239.106   
+10  Every year the Prime Minister has a list of al...    1233.029   
+11  A year after a supermoon’s light activated a d...    1056.861   
+12  Depicts a continuation of the "Battle of Mayan...    1053.669   
+13  In the land of Oz, ostracized and misunderstoo...    1045.227   
+14  A fading celebrity decides to use a black mark...     975.623   
+15  Four kayakers take the wrong river into a jung...     862.780   
+16  On the brink of the Second World War, a young ...     848.751   
+17  A returning war veteran, stricken with PTSD, g...     841.714   
+18  The love between Noah and Nick seems unwaverin...     829.910   
+19  After Santa Claus (codename: Red One) is kidna...     826.956   
+
+                         poster_path release_date  \
+0   /d8Ryb8AunYAuycVKDp5HpdWPKgC.jpg   2024-12-19   
+1   /i47IUSsN126K11JUzqQIOi1Mg1M.jpg   2024-12-11   
+2   /3L3l6LsiLGHkTG4RFB2aBA6BttB.jpg   2025-01-15   
+3   /5qGIxdEO841C0tdY8vOdLoRVrr0.jpg   2024-12-25   
+4   /jbOSUAWMGzGL1L4EaUF8K6zYFo7.jpg   2024-12-18   
+5   /aLVkiINlIeCkcZIzb7XHzPYgO6L.jpg   2024-11-21   
+6   /A9ENz6d4lC3UYOX8Z1gJwDEo1sM.jpg   2024-09-26   
+7   /2cxhvwyEwRlysAmRH4iodkvo0z5.jpg   2024-11-05   
+8   /aosm8NMQ3UyoBVpSxyimorCQykC.jpg   2024-10-22   
+9   /v313aUGmMNj6yNveaiQXysBmjVS.jpg   2025-01-16   
+10  /5T9WR7vIOnHm6xhVt5zBuPbBgt1.jpg   2025-01-10   
+11  /cRTctVlwvMdXVsaYbX5qfkittDP.jpg   2024-12-04   
+12  /qZKKwXyZ92K0mIRpf2FbCkQa7oO.jpg   2024-07-12   
+13  /xDGbZ0JJ3mYaGKy4Nzd9Kph6M9L.jpg   2024-11-20   
+14  /lqoMzCcZYEFK729d6qzt349fB4o.jpg   2024-09-07   
+15  /7lkm4eAvHy1uCs48GEwMxgwNdgd.jpg   2024-08-29   
+16  /rzsmKSFEsEWBLbJ968abffnfYZ7.jpg   2024-10-30   
+17  /gEHIVyJB9VWLF3cuJOpYjJjegd1.jpg   2024-09-27   
+18  /1sQA7lfcF9yUyoLYC0e6Zo3jmxE.jpg   2024-12-26   
+19  /cdqLnri3NEGcmfnqwk2TSIYtddg.jpg   2024-10-31   
+
+                                      title  video  vote_average  vote_count  
+0                      Sonic the Hedgehog 3  False         7.800        1062  
+1                         Kraven the Hunter  False         6.585         829  
+2                            Back in Action  False         6.698         524  
+3                                 Nosferatu  False         6.600        1503  
+4                     Mufasa: The Lion King  False         7.435         869  
+5                                   Moana 2  False         7.011         903  
+6                            Devara: Part 1  False         7.023          43  
+7                              Gladiator II  False         6.800        2512  
+8                     Venom: The Last Dance  False         6.800        2551  
+9                                    Alarum  False         5.846          52  
+10                             The Gardener  False         4.954          98  
+11                               Werewolves  False         6.298         233  
+12  Kingdom IV: Return of the Great General  False         7.100          59  
+13                                   Wicked  False         6.911        1496  
+14                            The Substance  False         7.136        3439  
+15                           River of Blood  False         6.000          15  
+16                                Number 24  False         7.270         165  
+17                                Aftermath  False         6.279          61  
+18                               Your Fault  False         7.167         939  
+19                                  Red One  False         7.121        2169  
+adult                0
+backdrop_path        0
+genre_ids            0
+id                   0
+original_language    0
+original_title       0
+overview             0
+popularity           0
+poster_path          0
+release_date         0
+title                0
+video                0
+vote_average         0
+vote_count           0
+dtype: int64</code></pre>
+</div>
+</div>
+<p>We are accessing data from The Movie Database (TMDb) API. The main website is https://www.themoviedb.org/. To access the API, we created an account through the main website and requested a key under the settings for the account. We aim to use the data given by this API to create a movie recommender system.</p>
+<p>The output of the code above is a data frame that contains predictors from the <code>change_keys</code> array and <code>images</code> objects for one page. There appear to be 20 results/observations per page and we will be adjusting the amount of pages for more observations. For the free plan that we currently have, we are restricted to 40 requests per 10 seconds per IP. Additionally, we can see from the output that there is no missing data to be handled.</p>
+<p>We will be using these predictors to extract movie information while changing endpoints to adjust for new/more information as needed. These types of variables include movie information of all types. We will be using variables related to the viewer and to the movies themselves. As we explore the API more, we will have definitive predictors that we will be using.</p>
 </section>
 <section id="research-questions" class="level2">
 <h2 class="anchored" data-anchor-id="research-questions">Research Question(s)</h2>
@@ -99,9 +299,11 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="proposed-project-timeline" class="level2">
 <h2 class="anchored" data-anchor-id="proposed-project-timeline">Proposed Project Timeline</h2>
+<p>We plan on having the data set loaded in by February 8th, tidy data by February 16th, and the explanatory analysis by February 28th. From then on, we plan on running models by March 8th, write-ups by March 12, edits and final draft by March 16th.</p>
 </section>
 <section id="questions-or-concerns" class="level2">
 <h2 class="anchored" data-anchor-id="questions-or-concerns">Questions or Concerns</h2>
+<p>The parts of this project that we anticipate to be difficult are the implementation of the recommender system, and making sure that it is able to recommend efficiently on the information that it is given. Working through the weeds of making sure our API is working and then being able to transform that data into a recommender will probably be one of the more difficult parts of the project. One potential problem that we anticipate is that the data we retrieved with our API will not be enough information to give a good movie recommendation, but so far it looks like there is a lot of good information on the movies that we can work with. There are no questions for the instructional team right now, but as they come up, we will be sure to reach out.</p>
 </section>
 
 </main>
@@ -185,27 +387,10 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-    var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-    }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-        // undo the damage that might have been done by quarto-nav.js in the case of
-        // links that we want to consider external
-        if (link.dataset.originalHref !== undefined) {
-          link.href = link.dataset.originalHref;
-        }
-      }
-    }
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+  function tippyHover(el, contentFn) {
     const config = {
       allowHTML: true,
+      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -215,17 +400,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start',
+      placement: 'bottom-start'
     };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -237,130 +413,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      if (note) {
-        return note.innerHTML;
-      } else {
-        return "";
-      }
-    });
-  }
-  const xrefs = window.document.querySelectorAll('a.quarto-xref');
-  const processXRef = (id, note) => {
-    // Strip column container classes
-    const stripColumnClz = (el) => {
-      el.classList.remove("page-full", "page-columns");
-      if (el.children) {
-        for (const child of el.children) {
-          stripColumnClz(child);
-        }
-      }
-    }
-    stripColumnClz(note)
-    if (id === null || id.startsWith('sec-')) {
-      // Special case sections, only their first couple elements
-      const container = document.createElement("div");
-      if (note.children && note.children.length > 2) {
-        container.appendChild(note.children[0].cloneNode(true));
-        for (let i = 1; i < note.children.length; i++) {
-          const child = note.children[i];
-          if (child.tagName === "P" && child.innerText === "") {
-            continue;
-          } else {
-            container.appendChild(child.cloneNode(true));
-            break;
-          }
-        }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(container);
-        }
-        return container.innerHTML
-      } else {
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(note);
-        }
-        return note.innerHTML;
-      }
-    } else {
-      // Remove any anchor links if they are present
-      const anchorLink = note.querySelector('a.anchorjs-link');
-      if (anchorLink) {
-        anchorLink.remove();
-      }
-      if (window.Quarto?.typesetMath) {
-        window.Quarto.typesetMath(note);
-      }
-      // TODO in 1.5, we should make sure this works without a callout special case
-      if (note.classList.contains("callout")) {
-        return note.outerHTML;
-      } else {
-        return note.innerHTML;
-      }
-    }
-  }
-  for (var i=0; i<xrefs.length; i++) {
-    const xref = xrefs[i];
-    tippyHover(xref, undefined, function(instance) {
-      instance.disable();
-      let url = xref.getAttribute('href');
-      let hash = undefined; 
-      if (url.startsWith('#')) {
-        hash = url;
-      } else {
-        try { hash = new URL(url).hash; } catch {}
-      }
-      if (hash) {
-        const id = hash.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note !== null) {
-          try {
-            const html = processXRef(id, note.cloneNode(true));
-            instance.setContent(html);
-          } finally {
-            instance.enable();
-            instance.show();
-          }
-        } else {
-          // See if we can fetch this
-          fetch(url.split('#')[0])
-          .then(res => res.text())
-          .then(html => {
-            const parser = new DOMParser();
-            const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.getElementById(id);
-            if (note !== null) {
-              const html = processXRef(id, note);
-              instance.setContent(html);
-            } 
-          }).finally(() => {
-            instance.enable();
-            instance.show();
-          });
-        }
-      } else {
-        // See if we can fetch a full url (with no hash to target)
-        // This is a special case and we should probably do some content thinning / targeting
-        fetch(url)
-        .then(res => res.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.querySelector('main.content');
-          if (note !== null) {
-            // This should only happen for chapter cross references
-            // (since there is no id in the URL)
-            // remove the first header
-            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-              note.children[0].remove();
-            }
-            const html = processXRef(null, note);
-            instance.setContent(html);
-          } 
-        }).finally(() => {
-          instance.enable();
-          instance.show();
-        });
-      }
-    }, function(instance) {
+      return note.innerHTML;
     });
   }
       let selectedAnnoteEl;
@@ -404,7 +457,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
-            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -430,32 +482,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
-        // Handle positioning of the toggle
-    window.addEventListener(
-      "resize",
-      throttle(() => {
-        elRect = undefined;
-        if (selectedAnnoteEl) {
-          selectCodeLines(selectedAnnoteEl);
-        }
-      }, 10)
-    );
-    function throttle(fn, ms) {
-    let throttle = false;
-    let timer;
-      return (...args) => {
-        if(!throttle) { // first call gets through
-            fn.apply(this, args);
-            throttle = true;
-        } else { // all the others get throttled
-            if(timer) clearTimeout(timer); // cancel #2
-            timer = setTimeout(() => {
-              fn.apply(this, args);
-              timer = throttle = false;
-            }, ms);
-        }
-      };
-    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -516,7 +542,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
-
 
 
 
