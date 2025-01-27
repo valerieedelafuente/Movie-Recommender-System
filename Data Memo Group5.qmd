@@ -28,7 +28,7 @@ response = requests.get(url, params=parameters)
 # Check if the request was successful
 if response.status_code == 200:
     data = response.json()  
-    movies = data["results"]  
+    movies = data["results"] 
     movies_df = pd.DataFrame(movies)
     print(movies_df)
 
