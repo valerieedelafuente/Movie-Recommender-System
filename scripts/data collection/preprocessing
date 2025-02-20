@@ -1,11 +1,7 @@
 import pandas as pd
 
 def preprocessing(dataframe):
-    # Drop duplicate rows
-    dataframe = dataframe.drop_duplicates()
-    
     # Map genre_ids to genre names
-    genre_dict = {genre["id"]: genre["name"] for genre in genres}
     dataframe['genre_ids'] = dataframe['genre_ids'].apply(lambda x: [genre_dict[genre_id] for genre_id in x])
     
     # Select columns
@@ -21,3 +17,4 @@ def preprocessing(dataframe):
 
 
 movies_df = preprocessing(movies_df)
+movies_df.head()
