@@ -2,13 +2,13 @@ import requests
 import pandas as pd
 import time
 
-api_key = "your_api_key"
+api_key = "d3e8d7fcb94be031986259192b4fdfb0"
 
-# Base URLs
-movies_url = "https://api.themoviedb.org/3/movie/popular"
+# Base URL for the TMDb popular movies endpoint
+url = "https://api.themoviedb.org/3/movie/popular"
 credits_url_template = "https://api.themoviedb.org/3/movie/{}/credits"
 
-total_pages = 5  # Adjust as needed
+total_pages = 499
 all_movies = []
 
 for page in range(1, total_pages + 1):
@@ -17,7 +17,7 @@ for page in range(1, total_pages + 1):
         "page": page
     }
     
-    response = requests.get(movies_url, params=parameters)
+    response = requests.get(url, params=parameters)
     
     if response.status_code == 200:
         data = response.json()
@@ -30,19 +30,18 @@ for page in range(1, total_pages + 1):
             
             if credits_response.status_code == 200:
                 credits_data = credits_response.json()
-                # Get only the first three cast members' names
-                cast_names = [cast["name"] for cast in credits_data.get("cast", [])[:3]]
-                movie["cast_names"] = ", ".join(cast_names)  # Store as a string
+                cast_names = [cast_member["name"] for cast_member in credits_data.get("cast", [])]
+                movie["cast_names"] = ", ".join(cast_names)  # Store as comma-separated string
             else:
-                movie["cast_names"] = None  # Handle missing cast data
+                movie["cast_names"] = None  # Handle missing data
             
-            time.sleep(0.2)  # Small delay to avoid rate limits
+            time.sleep(0.2)  # Short delay to avoid rate limiting
         
         all_movies.extend(movies)
     else:
         print("Error:", response.status_code)
 
-    time.sleep(0.5)  # Delay before fetching the next page
+    time.sleep(0.5)
 
 # Convert to DataFrame
 movies_df = pd.DataFrame(all_movies)
