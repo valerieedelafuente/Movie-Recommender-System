@@ -5,13 +5,9 @@ def preprocessing(dataframe):
     dataframe['genre_ids'] = dataframe['genre_ids'].apply(lambda x: [genre_dict[genre_id] for genre_id in x])
     
     # Select columns
-    dataframe = dataframe[['adult', 'id', 'title', 'genre_ids', 'original_language', 'overview', 'popularity', 'release_date', 'vote_average', 'vote_count', 'cast_names']]
-    
+    dataframe = dataframe[['adult', 'id', 'title', 'genre_ids', 'original_language', 'overview', 'popularity', 'release_date', 'vote_average', 'vote_count', 'cast_names', 'watch_providers']]
     
     ## more data preprocessing 
-    
-    
-    
     
     return dataframe
 
