@@ -1,4 +1,6 @@
 import pandas as pd
+import pycountry # for languages convertion
+
 
 # Adult column
 unique_vals_adult = movies_df['adult'].unique()
@@ -18,6 +20,17 @@ def clean_genre_ids(value):
 movies_df['genre_ids'] = movies_df['genre_ids'].apply(clean_genre_ids)
 
 # Tidy original language to be full word
+def convert_language_code(code):
+    try:
+        language = pycountry.languages.get(alpha_2=code)
+        return language.name
+    except:
+        return code  # no corresponding language, return original language code
+
+
+movies_df['original_language_full'] = movies_df['original_language'].apply(convert_language_code)
+print(movies_df[['original_language', 'original_language_full']].head())
+
 
 # Omit overview?
 

@@ -37,3 +37,9 @@ movies_df = pd.DataFrame(all_movies)
 # Checking for missing data
 missing_data = movies_df.isnull().sum()
 print(missing_data)
+
+# Optional: convert movie_df to csv file
+# Convenient for me to watch columns
+#movies_df.to_csv('movies_df.csv', index=False)
+#movies_df.to_csv('~/Desktop/Pstat134/movies_df.csv', index=False)
+
