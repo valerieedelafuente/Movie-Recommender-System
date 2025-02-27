@@ -33,9 +33,6 @@ movies_df['original_language'] = movies_df['original_language'].apply(convert_la
 print(movies_df[['original_language']].head())
 
 
-# Omit overview?
-
-
 # Popularity, vote average, vote count
     """
     Popularity: Calculated based on a variety of factors.
@@ -58,4 +55,37 @@ movies_df['popularity'] = pd.to_numeric(movies_df['popularity'], errors='coerce'
 movies_df['vote_average'] = pd.to_numeric(movies_df['vote_average'], errors='coerce')
 movies_df['vote_count'] = pd.to_numeric(movies_df['vote_count'], errors='coerce')
 
+# overview - nlp
+import re
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
 
+nltk.download('stopwords')
+
+stop_words = set(stopwords.words('english'))
+lemmatizer = WordNetLemmatizer()
+
+
+def preprocess_text(text):
+    if not isinstance(text, str):
+        return ""
+    
+    # remove punctuation and special characters, keep letters and spaces
+    text = re.sub(r'[^a-zA-Z\s]', '', text)
+    
+    # lower-case
+    text = text.lower()
+    
+    # token
+    tokens = text.split()
+    
+    # remove stop word, stemming
+    tokens = [lemmatizer.lemmatize(word) for word in tokens if word not in stop_words]
+    
+    # reconstruct into a string
+    return " ".join(tokens)
+
+movies_df['overview_processed'] = movies_df['overview'].apply(preprocess_text)
+print(movies_df[['overview', 'overview_processed']].head())
+    
