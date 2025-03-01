@@ -6,6 +6,7 @@ import pycountry # for languages convertion
 unique_vals_adult = movies_df['adult'].unique()
 print(unique_vals_adult) # Should we omit this?
 
+-----------------------------------------------------------
 # Tidying genre_IDs 
 def clean_genre_ids(value):
     if isinstance(value, list):  # If it's already a list, clean and join
@@ -19,7 +20,7 @@ def clean_genre_ids(value):
     # Apply the function to genre_ids column
 movies_df['genre_ids'] = movies_df['genre_ids'].apply(clean_genre_ids)
 
-
+-----------------------------------------------------------
 # Tidy original language to be full word
 def convert_language_code(code):
     try:
@@ -55,13 +56,14 @@ movies_df['popularity'] = pd.to_numeric(movies_df['popularity'], errors='coerce'
 movies_df['vote_average'] = pd.to_numeric(movies_df['vote_average'], errors='coerce')
 movies_df['vote_count'] = pd.to_numeric(movies_df['vote_count'], errors='coerce')
 
+-----------------------------------------------------------
 # overview - nlp
 import re
 import nltk
+nltk.download('stopwords')
+nltk.download('punkt') # needed for word tokenization
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
-
-nltk.download('stopwords')
 
 stop_words = set(stopwords.words('english'))
 lemmatizer = WordNetLemmatizer()
@@ -88,4 +90,9 @@ def preprocess_text(text):
 
 movies_df['overview_processed'] = movies_df['overview'].apply(preprocess_text)
 print(movies_df[['overview', 'overview_processed']].head())
+
+
+print(movies_df.columns)
+-----------------------------------------------------------
+
     
