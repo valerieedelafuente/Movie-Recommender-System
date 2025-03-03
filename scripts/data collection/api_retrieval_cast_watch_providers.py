@@ -9,7 +9,7 @@ url = "https://api.themoviedb.org/3/movie/popular"
 credits_url_template = "https://api.themoviedb.org/3/movie/{}/credits"
 providers_url_template = "https://api.themoviedb.org/3/movie/{}/watch/providers"
 
-total_pages = 499
+total_pages = 100
 all_movies = []
 
 for page in range(1, total_pages + 1):

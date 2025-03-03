@@ -2,11 +2,6 @@ import pandas as pd
 import pycountry # for languages convertion
 
 
-# Adult column
-unique_vals_adult = movies_df['adult'].unique()
-print(unique_vals_adult) # Should we omit this?
-
------------------------------------------------------------
 # Tidying genre_IDs 
 def clean_genre_ids(value):
     if isinstance(value, list):  # If it's already a list, clean and join
@@ -20,7 +15,7 @@ def clean_genre_ids(value):
     # Apply the function to genre_ids column
 movies_df['genre_ids'] = movies_df['genre_ids'].apply(clean_genre_ids)
 
------------------------------------------------------------
+
 # Tidy original language to be full word
 def convert_language_code(code):
     try:
@@ -28,10 +23,8 @@ def convert_language_code(code):
         return language.name
     except:
         return code  # no corresponding language, return original language code
-
-
+      
 movies_df['original_language'] = movies_df['original_language'].apply(convert_language_code)
-print(movies_df[['original_language']].head())
 
 
 # Popularity, vote average, vote count
@@ -47,52 +40,32 @@ print(movies_df[['original_language']].head())
                 The more votes there are, the more reliable the average score is.
     """
     
-    # Check missing value. Result: No missing value
-print(movies_df[['popularity', 'vote_average', 'vote_count']].isnull().sum())
-    # Statistics
+    # Statistics for popularity, vote average, and vote count
 print(movies_df[['popularity', 'vote_average', 'vote_count']].describe())
+
     # Data type
 movies_df['popularity'] = pd.to_numeric(movies_df['popularity'], errors='coerce')
 movies_df['vote_average'] = pd.to_numeric(movies_df['vote_average'], errors='coerce')
 movies_df['vote_count'] = pd.to_numeric(movies_df['vote_count'], errors='coerce')
 
------------------------------------------------------------
-# overview - nlp
-import re
-import nltk
-nltk.download('stopwords')
-nltk.download('punkt') # needed for word tokenization
-from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
 
-stop_words = set(stopwords.words('english'))
-lemmatizer = WordNetLemmatizer()
+# Creating a `user_id` column
+valid_indices = movies_df["user_rating"].notna() & (movies_df["user_rating"] != "")
+movies_df.loc[valid_indices, "user_id"] = range(1, valid_indices.sum() + 1)
+
+# Convert user_id to integers
+movies_df["user_id"] = movies_df["user_id"].astype("Int64")  # Keeps None as <NA>
 
 
-def preprocess_text(text):
-    if not isinstance(text, str):
-        return ""
-    
-    # remove punctuation and special characters, keep letters and spaces
-    text = re.sub(r'[^a-zA-Z\s]', '', text)
-    
-    # lower-case
-    text = text.lower()
-    
-    # token
-    tokens = text.split()
-    
-    # remove stop word, stemming
-    tokens = [lemmatizer.lemmatize(word) for word in tokens if word not in stop_words]
-    
-    # reconstruct into a string
-    return " ".join(tokens)
-
-movies_df['overview_processed'] = movies_df['overview'].apply(preprocess_text)
-print(movies_df[['overview', 'overview_processed']].head())
+# Making user ratings uniform
+  # Convert to numeric values (coerce invalid entries to NaN)
+movies_df["user_rating"] = pd.to_numeric(movies_df["user_rating"], errors="coerce")
+  # Replace NaN with 0 or any other value of choice, before converting to integers
+movies_df["user_rating"] = movies_df["user_rating"].fillna(0).round().astype(int)
 
 
-print(movies_df.columns)
------------------------------------------------------------
-
-    
+# Changing the `title` type
+  # Convert to pandas' new string type
+movies_df["title"] = movies_df["title"].astype("string")
+  # Check the dtype again
+print(movies_df["title"].dtype)
