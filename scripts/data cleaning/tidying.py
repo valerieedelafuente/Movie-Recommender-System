@@ -1,5 +1,6 @@
 import pandas as pd
 import pycountry # for languages convertion
+import pandas as pd
 
 
 # Tidying genre_IDs 
@@ -14,9 +15,14 @@ def clean_genre_ids(value):
 
     # Apply the function to genre_ids column
 movies_df['genre_ids'] = movies_df['genre_ids'].apply(clean_genre_ids)
+    # Check genre_ids missing and type
+movies_df['genre_ids'].isna().sum() # No missing data
+movies_df['genre_ids'].apply(type).value_counts() # All are string type
 
 
-# Tidy original language to be full word
+
+
+# Tidying original language to be full word
 def convert_language_code(code):
     try:
         language = pycountry.languages.get(alpha_2=code)
@@ -40,21 +46,29 @@ movies_df['original_language'] = movies_df['original_language'].apply(convert_la
                 The more votes there are, the more reliable the average score is.
     """
     
-    # Statistics for popularity, vote average, and vote count
-print(movies_df[['popularity', 'vote_average', 'vote_count']].describe())
-
     # Data type
 movies_df['popularity'] = pd.to_numeric(movies_df['popularity'], errors='coerce')
 movies_df['vote_average'] = pd.to_numeric(movies_df['vote_average'], errors='coerce')
+movies_df['vote_average'] = movies_df['vote_average'].round(0).astype(int) # vote_average to round
 movies_df['vote_count'] = pd.to_numeric(movies_df['vote_count'], errors='coerce')
 
+    # Statistics for popularity, vote average, and vote count
+print(movies_df[['popularity', 'vote_average', 'vote_count']].describe())
 
-# Creating a `user_id` column
+
+# Tidying user_id
+  # Creating a `user_id` column
 valid_indices = movies_df["user_rating"].notna() & (movies_df["user_rating"] != "")
 movies_df.loc[valid_indices, "user_id"] = range(1, valid_indices.sum() + 1)
 
-# Convert user_id to integers
+  # Convert `user_id` to integers
 movies_df["user_id"] = movies_df["user_id"].astype("Int64")  # Keeps None as <NA>
+
+
+# Tidying user_name
+  #`user_name` check missing and convert to NA
+movies_df['user_name'] = movies_df['user_name'].replace('', pd.NA)
+movies_df['user_name'].eq('').sum()#check convert NA success or fail
 
 
 # Making user ratings uniform
@@ -69,3 +83,14 @@ movies_df["user_rating"] = movies_df["user_rating"].fillna(0).round().astype(int
 movies_df["title"] = movies_df["title"].astype("string")
   # Check the dtype again
 print(movies_df["title"].dtype)
+
+  
+# Tidying release_date
+  # `release_date` check
+movies_df[movies_df['release_date'].isna()] #only row 571 miss release date
+movies_df['release_date'] = movies_df['release_date'].fillna(pd.NA) #convert missing to NA
+
+movies_df['release_date'] = pd.to_datetime(movies_df['release_date'], errors='coerce')#check format
+movies_df['release_date'] = movies_df['release_date'].dt.strftime('%Y-%m-%d') #only that row 571 fail
+movies_df['release_date'].apply(type).value_counts() #except the missing one, the rest are string type
+
