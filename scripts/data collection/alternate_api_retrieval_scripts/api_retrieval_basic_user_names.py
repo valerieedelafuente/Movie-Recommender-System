@@ -81,3 +81,16 @@ for page in range(1, total_pages + 1):
 
 # Convert to DataFrame
 movies_df = pd.DataFrame(all_movies)
+
+
+
+
+
+
+
+
+
+
+
+
+

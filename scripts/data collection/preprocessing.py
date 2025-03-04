@@ -13,4 +13,3 @@ def preprocessing(dataframe):
 
 
 movies_df = preprocessing(movies_df)
-movies_df.head()
