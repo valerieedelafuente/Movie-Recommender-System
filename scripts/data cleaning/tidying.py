@@ -20,8 +20,6 @@ movies_df['genre_ids'].isna().sum() # No missing data
 movies_df['genre_ids'].apply(type).value_counts() # All are string type
 
 
-
-
 # Tidying original language to be full word
 def convert_language_code(code):
     try:
@@ -56,10 +54,27 @@ movies_df['vote_count'] = pd.to_numeric(movies_df['vote_count'], errors='coerce'
 print(movies_df[['popularity', 'vote_average', 'vote_count']].describe())
 
 
-# Tidying user_id
+# Creating a `release_year` column
+movies_df = movies_df.copy()  # Ensure movies_df is a separate DataFrame
+movies_df["release_year"] = movies_df["release_date"].astype(str).str[:4].astype(int)
+movies_df = movies_df.drop(columns=["release_date"])
+
+
+# Tidying `user_id`
   # Creating a `user_id` column
+user_id_map = {}  # Dictionary to store user_name -> user_id mapping
+current_id = 1
+
 valid_indices = movies_df["user_rating"].notna() & (movies_df["user_rating"] != "")
-movies_df.loc[valid_indices, "user_id"] = range(1, valid_indices.sum() + 1)
+
+for idx in movies_df.loc[valid_indices].index:
+    user_name = movies_df.at[idx, "user_name"]
+    
+    if user_name not in user_id_map:
+        user_id_map[user_name] = current_id
+        current_id += 1
+    
+    movies_df.at[idx, "user_id"] = user_id_map[user_name]
 
   # Convert `user_id` to integers
 movies_df["user_id"] = movies_df["user_id"].astype("Int64")  # Keeps None as <NA>
@@ -93,4 +108,15 @@ movies_df['release_date'] = movies_df['release_date'].fillna(pd.NA) #convert mis
 movies_df['release_date'] = pd.to_datetime(movies_df['release_date'], errors='coerce')#check format
 movies_df['release_date'] = movies_df['release_date'].dt.strftime('%Y-%m-%d') #only that row 571 fail
 movies_df['release_date'].apply(type).value_counts() #except the missing one, the rest are string type
+
+
+# Tidying `popularity`
+movies_df.loc[:, "popularity"] = movies_df["popularity"].round(0).astype(int)
+
+# Reordering column names
+  # Define the new column order
+new_column_order = ['id', 'title', 'release_year', 'genre_ids', 'original_language', 'cast_names', 'watch_providers', 'popularity', 'vote_average', 'vote_count', 'user_name', 'user_id', 'user_rating']
+# Reorganize columns in the DataFrame
+movies_df = movies_df[new_column_order]
+
 
