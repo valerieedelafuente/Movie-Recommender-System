@@ -56,7 +56,13 @@ print(movies_df[['popularity', 'vote_average', 'vote_count']].describe())
 
 # Creating a `release_year` column
 movies_df = movies_df.copy()  # Ensure movies_df is a separate DataFrame
-movies_df["release_year"] = movies_df["release_date"].astype(str).str[:4].astype(int)
+
+#code created by Leslie
+movies_df["release_date"] = movies_df["release_date"].astype(str)
+movies_df = movies_df[movies_df["release_date"] != '']
+movies_df["release_year"] = pd.to_numeric(movies_df["release_date"].str[:4], errors = "coerce")
+
+#movies_df["release_year"] = movies_df["release_date"].astype(str).str[:4].astype(int)
 movies_df = movies_df.drop(columns=["release_date"])
 
 
