@@ -94,9 +94,9 @@ movies_df['user_name'].eq('').sum()#check convert NA success or fail
 
 # Making user ratings uniform
   # Convert to numeric values (coerce invalid entries to NaN)
-movies_df["user_rating"] = pd.to_numeric(movies_df["user_rating"], errors="coerce")
+#movies_df["user_rating"] = pd.to_numeric(movies_df["user_rating"], errors="coerce")
   # Replace NaN with 0 or any other value of choice, before converting to integers
-movies_df["user_rating"] = movies_df["user_rating"].fillna(0).round().astype(int)
+#movies_df["user_rating"] = movies_df["user_rating"].fillna(0).round().astype(int)
 
 
 # Changing the `title` type
