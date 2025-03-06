@@ -99,19 +99,10 @@ movies_df["title"] = movies_df["title"].astype("string")
   # Check the dtype again
 print(movies_df["title"].dtype)
 
-  
-# Tidying release_date
-  # `release_date` check
-movies_df[movies_df['release_date'].isna()] #only row 571 miss release date
-movies_df['release_date'] = movies_df['release_date'].fillna(pd.NA) #convert missing to NA
-
-movies_df['release_date'] = pd.to_datetime(movies_df['release_date'], errors='coerce')#check format
-movies_df['release_date'] = movies_df['release_date'].dt.strftime('%Y-%m-%d') #only that row 571 fail
-movies_df['release_date'].apply(type).value_counts() #except the missing one, the rest are string type
-
 
 # Tidying `popularity`
 movies_df.loc[:, "popularity"] = movies_df["popularity"].round(0).astype(int)
+
 
 # Reordering column names
   # Define the new column order
