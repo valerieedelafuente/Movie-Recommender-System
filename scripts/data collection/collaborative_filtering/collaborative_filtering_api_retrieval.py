@@ -53,8 +53,4 @@ for movie_id in movies_df["id"]:
 # Convert reviews to DataFrame
 movie_reviews_df = pd.DataFrame(reviews_data)
 
-# Fetch reviews for each movie
-reviews_data = []
-
-
 
