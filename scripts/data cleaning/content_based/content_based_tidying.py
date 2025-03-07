@@ -14,10 +14,10 @@ def clean_genre_ids(value):
     return value  # Return as is if neither case
 
     # Apply the function to genre_ids column
-movies_df['genre_ids'] = movies_df['genre_ids'].apply(clean_genre_ids)
+movie_content_df['genre_ids'] = movie_content_df['genre_ids'].apply(clean_genre_ids)
     # Check genre_ids missing and type
-movies_df['genre_ids'].isna().sum() # No missing data
-movies_df['genre_ids'].apply(type).value_counts() # All are string type
+movie_content_df['genre_ids'].isna().sum() # No missing data
+movies_content_df['genre_ids'].apply(type).value_counts() # All are string type
 
 
 # Tidying original language to be full word
@@ -28,38 +28,50 @@ def convert_language_code(code):
     except:
         return code  # no corresponding language, return original language code
       
-movies_df['original_language'] = movies_df['original_language'].apply(convert_language_code)
+movie_content_df['original_language'] = movie_content_df['original_language'].apply(convert_language_code)
 
 
-# Vote average
+# Vote average, vote count
     """
     Vote average: Average of all user ratings, on a scale of 1 to 10.
                   A quantitative assessment of the overall quality of a movie.
+    
+    Vote count: The total number of people who voted for the movie.
+                The more votes there are, the more reliable the average score is.
     """
+    
     # Data type
-movies_df['vote_average'] = pd.to_numeric(movies_df['vote_average'], errors='coerce')
-movies_df['vote_average'] = movies_df['vote_average'].round(0).astype(int) # vote_average to round
+movie_content_df['vote_average'] = pd.to_numeric(movie_content_df['vote_average'], errors='coerce')
+movie_content_df['vote_average'] = movie_content_df['vote_average'].round(0).astype(int) # vote_average to round
+movie_content_df['vote_count'] = pd.to_numeric(movie_content_df['vote_count'], errors='coerce')
 
 
 # Creating a `release_year` column
-movies_df = movies_df.copy()  # Ensure movies_df is a separate DataFrame
-movies_df["release_date"] = movies_df["release_date"].astype(str)
-movies_df = movies_df[movies_df["release_date"] != '']
-movies_df["release_year"] = pd.to_numeric(movies_df["release_date"].str[:4], errors = "coerce")
-movies_df = movies_df.drop(columns=["release_date"])
+movie_content_df = movie_content_df.copy()  # Ensure movies_df is a separate DataFrame
+movie_content_df["release_date"] = movie_content_df["release_date"].astype(str)
+movie_content_df = movies_df[movie_content_df["release_date"] != '']
+movie_content_df["release_year"] = pd.to_numeric(movie_content_df["release_date"].str[:4], errors = "coerce")
+#movie_content_df["release_year"] = movie_content_df["release_date"].astype(str).str[:4].astype(int)
+movie_content_df = movie_content_df.drop(columns=["release_date"])
 
 
 # Changing the `title` type
   # Convert to pandas' new string type
-movies_df["title"] = movies_df["title"].astype("string")
+movie_content_df["title"] = movie_content_df["title"].astype("string")
   # Check the dtype again
-print(movies_df["title"].dtype)
+print(movie_content_df["title"].dtype)
+    
+    
+# Editing `cast_names`
+movie_content_df["cast_names"] = movie_content_df["cast_names"].replace("", pd.NA)
+
+
+# Editing `watch_providers`
+movie_content_df["watch_providers"] = movie_content_df["watch_providers"].replace("", pd.NA)
 
 
 # Reordering column names
   # Define the new column order
-new_column_order = ['id', 'title', 'release_year', 'genre_ids', 'original_language', 'cast_names', 'watch_providers', 'vote_average']
+new_column_order = ['id', 'title', 'release_year', 'genre_ids', 'original_language', 'cast_names', 'watch_providers', 'vote_average', 'vote_count']
 # Reorganize columns in the DataFrame
-movies_df = movies_df[new_column_order]
-
-
+movie_content_df = movie_content_df[new_column_order]

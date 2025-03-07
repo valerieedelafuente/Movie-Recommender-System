@@ -9,7 +9,7 @@ url = "https://api.themoviedb.org/3/movie/popular"
 credits_url_template = "https://api.themoviedb.org/3/movie/{}/credits"
 providers_url_template = "https://api.themoviedb.org/3/movie/{}/watch/providers"
 
-total_pages = 100
+total_pages = 200
 all_movies = []
 
 for page in range(1, total_pages + 1):
@@ -58,11 +58,4 @@ for page in range(1, total_pages + 1):
     time.sleep(0.5)
     
 # Convert to DataFrame
-movies_df = pd.DataFrame(all_movies)
-
-# Checking for missing data
-missing_data = movies_df.isnull().sum()
-print(missing_data)
-
-# Display the first few rows
-print(movies_df[["title", "cast_names", "watch_providers"]].head())
+movie_content_df = pd.DataFrame(all_movies)
