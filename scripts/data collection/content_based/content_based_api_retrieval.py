@@ -21,10 +21,11 @@ for page in range(1, total_pages + 1):
         movies = data["results"]
         
         for movie in movies:
-            movie_id = movie["id"]
+            movie["movie_id"] = movie.pop("id")  # Rename 'id' to 'movie_id'
+            movie["rating_average"] = movie.pop("vote_average")  # Rename 'vote_average' to 'rating_average'
             
             # Get cast names
-            credits_url = credits_url_template.format(movie_id)
+            credits_url = credits_url_template.format(movie["movie_id"])
             credits_response = requests.get(credits_url, params={"api_key": api_key})
             if credits_response.status_code == 200:
                 credits_data = credits_response.json()
@@ -34,7 +35,7 @@ for page in range(1, total_pages + 1):
                 movie["cast_names"] = None
             
             # Get watch providers
-            providers_url = providers_url_template.format(movie_id)
+            providers_url = providers_url_template.format(movie["movie_id"])
             providers_response = requests.get(providers_url, params={"api_key": api_key})
             if providers_response.status_code == 200:
                 providers_data = providers_response.json()
@@ -59,3 +60,4 @@ for page in range(1, total_pages + 1):
     
 # Convert to DataFrame
 movie_content_df = pd.DataFrame(all_movies)
+

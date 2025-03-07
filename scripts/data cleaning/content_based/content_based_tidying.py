@@ -31,9 +31,9 @@ def convert_language_code(code):
 movie_content_df['original_language'] = movie_content_df['original_language'].apply(convert_language_code)
 
 
-# Vote average, vote count
+# Rating average, vote count
     """
-    Vote average: Average of all user ratings, on a scale of 1 to 10.
+    Rating average: Average of all user ratings, on a scale of 1 to 10.
                   A quantitative assessment of the overall quality of a movie.
     
     Vote count: The total number of people who voted for the movie.
@@ -41,8 +41,8 @@ movie_content_df['original_language'] = movie_content_df['original_language'].ap
     """
     
     # Data type
-movie_content_df['vote_average'] = pd.to_numeric(movie_content_df['vote_average'], errors='coerce')
-movie_content_df['vote_average'] = movie_content_df['vote_average'].round(0).astype(int) # vote_average to round
+movie_content_df['rating_average'] = pd.to_numeric(movie_content_df['rating_average'], errors='coerce')
+movie_content_df['rating_average'] = movie_content_df['rating_average'].round(0).astype(int) # vote_average to round
 movie_content_df['vote_count'] = pd.to_numeric(movie_content_df['vote_count'], errors='coerce')
 
 
@@ -72,6 +72,6 @@ movie_content_df["watch_providers"] = movie_content_df["watch_providers"].replac
 
 # Reordering column names
   # Define the new column order
-new_column_order = ['id', 'title', 'release_year', 'genre_ids', 'original_language', 'cast_names', 'watch_providers', 'vote_average', 'vote_count']
+new_column_order = ['movie_id', 'title', 'release_year', 'genre_ids', 'original_language', 'cast_names', 'watch_providers', 'rating_average', 'vote_count']
 # Reorganize columns in the DataFrame
 movie_content_df = movie_content_df[new_column_order]
