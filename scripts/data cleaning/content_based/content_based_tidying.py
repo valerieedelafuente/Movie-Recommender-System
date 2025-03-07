@@ -17,7 +17,7 @@ def clean_genre_ids(value):
 movie_content_df['genre_ids'] = movie_content_df['genre_ids'].apply(clean_genre_ids)
     # Check genre_ids missing and type
 movie_content_df['genre_ids'].isna().sum() # No missing data
-movies_content_df['genre_ids'].apply(type).value_counts() # All are string type
+movie_content_df['genre_ids'].apply(type).value_counts() # All are string type
 
 
 # Tidying original language to be full word

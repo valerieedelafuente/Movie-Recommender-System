@@ -54,6 +54,8 @@ movie_reviews_df = pd.DataFrame(reviews_data)
 # Fetch reviews for each movie
 reviews_data = []
 
+timeout_duration = 0.5
+
 for movie_id in movies_df["id"]:
     try:
         response = requests.get(reviews_url_template.format(movie_id), params={"api_key": api_key}, timeout=timeout_duration)
