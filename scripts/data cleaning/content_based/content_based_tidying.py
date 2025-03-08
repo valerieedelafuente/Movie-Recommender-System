@@ -49,7 +49,7 @@ movie_content_df['vote_count'] = pd.to_numeric(movie_content_df['vote_count'], e
 # Creating a `release_year` column
 movie_content_df = movie_content_df.copy()  # Ensure movies_df is a separate DataFrame
 movie_content_df["release_date"] = movie_content_df["release_date"].astype(str)
-movie_content_df = movies_df[movie_content_df["release_date"] != '']
+movie_content_df = movie_content_df[movie_content_df["release_date"] != '']
 movie_content_df["release_year"] = pd.to_numeric(movie_content_df["release_date"].str[:4], errors = "coerce")
 #movie_content_df["release_year"] = movie_content_df["release_date"].astype(str).str[:4].astype(int)
 movie_content_df = movie_content_df.drop(columns=["release_date"])

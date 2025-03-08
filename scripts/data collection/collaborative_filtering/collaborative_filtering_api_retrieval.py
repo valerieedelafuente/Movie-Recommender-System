@@ -74,6 +74,7 @@ for movie_id in movies_df["id"]:
         break  # Or handle it in another way
 
     time.sleep(0.5)
+    print(page)
 
 # Convert reviews to DataFrame
 movie_reviews_df = pd.DataFrame(reviews_data)

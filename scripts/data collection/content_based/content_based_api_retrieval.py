@@ -57,6 +57,7 @@ for page in range(1, total_pages + 1):
         print("Error:", response.status_code)
     
     time.sleep(0.5)
+    print(page)
     
 # Convert to DataFrame
 movie_content_df = pd.DataFrame(all_movies)
