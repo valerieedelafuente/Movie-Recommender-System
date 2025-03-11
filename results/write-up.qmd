@@ -16,11 +16,11 @@ execute:
 
 ### Objective
 
-This project aims to build a movie recommendation system using data retrieved from The Movie Database (TMDb) API and Python-based machine learning techniques.
+This project aims to develop a movie recommendation system using data from The Movie Database (TMDb) API. By applying Python-based machine learning techniques, the system will analyze user preferences and suggest relevant movies. The goal is to create a personalized, efficient recommendation system that enhances content discovery for users.
 
 ### Motivation
 
-As the world becomes increasingly digitized, effective recommendation systems are crucial for enhancing user experience by providing personalized content suggestions.
+In today's digital entertainment world, users are overwhelmed with content options, making personalized recommendations more essential than ever. Recommendation systems help by offering tailored suggestions, improving user engagement and satisfaction. With platforms like Netflix and Hulu relying on data-driven algorithms, effective recommendation systems are crucial in enhancing viewer experience. Using data from an API like TMDb, which includes extensive movie data, allows for more accurate and relevant content suggestions. This allows for a more engaging and relevant user experience, fostering deeper interaction with the platform and greater satisfaction with the recommendations provided.
 
 ### Data Description
 
