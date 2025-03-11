@@ -29,16 +29,17 @@ def convert_language_code(code):
         return code  # no corresponding language, return original language code
       
 movie_content_df['original_language'] = movie_content_df['original_language'].apply(convert_language_code)
-
+movie_content_df["original_language"] = movie_content_df["original_language"].replace("cn", "Chinese") # cn to Chinese
+movie_content_df["original_language"] = movie_content_df["original_language"].replace("xx", "Unknown") # xx to Unknown
 
 # Rating average, vote count
-    """
+"""
     Rating average: Average of all user ratings, on a scale of 1 to 10.
                   A quantitative assessment of the overall quality of a movie.
     
     Vote count: The total number of people who voted for the movie.
                 The more votes there are, the more reliable the average score is.
-    """
+"""
     
     # Data type
 movie_content_df['rating_average'] = pd.to_numeric(movie_content_df['rating_average'], errors='coerce')
