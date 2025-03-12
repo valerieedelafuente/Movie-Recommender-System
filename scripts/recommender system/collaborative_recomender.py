@@ -37,8 +37,9 @@ def item_based_recommender(title, num_recs=10):
 
     popular_streaming_services = [
         'Netflix', 'Amazon Prime Video', 'Hulu', 'Disney+', 'Apple TV', 'HBO Max', 
-        'YouTube', 'Google Play Movies', 'Vudu', 'Peacock', 'Paramount+', 'Fandango Now',
-        'Max', 'Mubi', 'Amazon Video', 'Netflix basic with Ads', 'Hoopla']
+        'YouTube', 'Google Play Movies', 'Peacock', 'Paramount+',
+        'Max', 'Mubi', 'Amazon Video', 'Netflix basic with Ads', 'Hoopla', 'Vudu']
+    
     
     recommendations = []
     for i in range(1, len(indices.flatten())):  # Skip the first (it’s the movie itself)
@@ -50,7 +51,10 @@ def item_based_recommender(title, num_recs=10):
             genre_ids = ast.literal_eval(genre_ids)
             genre_str = ", ".join(genre_ids)
             watch_providers = movie_info['watch_providers'].iloc[0]
-            filtered_watch_providers = [provider.strip() for provider in watch_providers.split(',') if any(popular in provider for popular in popular_streaming_services)]
+            if isinstance(watch_providers, float):
+              watch_providers = ""
+            filtered_watch_providers = [provider.strip() for provider in watch_providers.split(',') 
+                            if any(popular.lower() in provider.lower() for popular in popular_streaming_services)]
             formatted_watch_providers = ", ".join(filtered_watch_providers)
             recommendations.append((movie_name, genre_str, avg_rating, formatted_watch_providers))
     print(f"🎬 Using matched movie: {title}\n")
@@ -59,6 +63,4 @@ def item_based_recommender(title, num_recs=10):
     for i, (movie_name, genre, rating, watch_providers) in enumerate(recommendations, start=1):
         print(f"{i}. {movie_name} (Genre: {genre}, Rating: {rating})")
         print(f"   📺 Where to stream: {watch_providers}")
-
-    return recommendations
 
