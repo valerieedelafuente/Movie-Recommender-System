@@ -27,7 +27,13 @@ for page in range(1, total_pages + 1):
     time.sleep(0.5)  # Prevent rate-limiting
 
 # Convert movies to DataFrame
-movies_df = pd.DataFrame(all_movies)[["id"]]
+movies_df = pd.DataFrame(all_movies)
+movies_df_uncleaned = movies_df.copy()
+movies_df_uncleaned.to_csv("movies_data_uncleaned.csv", index=False)
+
+movies_df = pd.DataFrame(all_movies)[['id', 'title']]
+movie_content_df = movies_df_uncleaned[['id', 'title', 'genre_ids', 'vote_average']]
+
 
 # Fetch reviews for each movie
 reviews_data = []
@@ -82,3 +88,7 @@ for movie_id in movies_df["id"]:
 # Convert reviews to DataFrame
 movie_reviews_df = pd.DataFrame(reviews_data)
 
+
+# Save both dataframes
+movies_df.to_csv("movies_data.csv", index=False)
+movie_reviews_df.to_csv("movie_reviews_data.csv", index=False)

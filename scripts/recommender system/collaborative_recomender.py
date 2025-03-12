@@ -5,20 +5,14 @@ from sklearn.neighbors import NearestNeighbors
 import random
 import numpy as np
 
-# thinking content based recs for movies with no user rating, then hybrid system for all other movies
-# hybrid system finds recs for content based and collaborative based, then finds weighted avg and returns top few recs from avg
-movies_copy = movies_df.copy()
+# Join movies_df and movie_reviews_df and clean
+movies_merged = pd.merge(movies_df, movie_reviews_df, left_on='id', right_on='movie_id')
+columns = ['title', 'movie_id', 'user_id', 'user_rating']
+movies_merged = movies_merged[columns]
 
-# Show that most users have only rated one movie, so we choose to keep all users in
-user_ratings_count = movies_copy['user_id'].value_counts()
-plt.hist(user_ratings_count, bins=50)
-plt.xlim(0, 50)
-plt.show()
-
-# Every row represents an movie and every column a user ID
-# Values are that user's review of the movie
-movies_pivot = movies_copy.pivot_table(index="title",columns="user_id",values="user_rating").fillna(0)
-movies_pivot
+# Every row represents a movie and every column a user/reviewer
+# Values are that users review/rating of the movie
+movies_pivot = movies_merged.pivot_table(index="title",columns="user_id",values="user_rating").fillna(0)
 
 # Create Compressed Sparse Row (CSR) matrix
 movies_matrix = csr_matrix(movies_pivot.values)
@@ -26,6 +20,8 @@ movies_matrix = csr_matrix(movies_pivot.values)
 # Fit KNN model with cosine similarity as distance metric
 knn = NearestNeighbors(metric = "cosine", algorithm = "brute")
 knn.fit(movies_matrix)
+
+### Stop running here and skip to bottom to run ###
 
 # Test it with one movie
 query_no = np.random.choice(movies_pivot.shape[0])
@@ -95,34 +91,32 @@ def collaborative_recommender(title, num_recs = 10):
 
 
 
-# Uncommented for running
 
-def collaborative_recommender(title, num_recs = 10):
-    title = str(title)
-    movies_copy = movies_df.copy()
-    movies_pivot = movies_copy.pivot_table(index="title", columns="user_id", values="user_rating").fillna(0)
-    movies_matrix = csr_matrix(movies_pivot.values)
-    knn = NearestNeighbors(metric="cosine", algorithm="brute")
-    knn.fit(movies_matrix)
-    query_no = movies_pivot.index.get_loc(title)
-    distances, indices = knn.kneighbors(movies_pivot.iloc[query_no,:].values.reshape(1, -1), n_neighbors=num_recs)
-    num = []
-    name = []
-    distance = []
-    rating = []
-    for i in range(0, len(distances.flatten())):
-        if i == 0:
-            print(f"Recommendations for {title} viewers:\n")
-        else:
-            movie_name = movies_pivot.index[indices.flatten()[i]]
-            print(f"{i}: {movie_name} , with a distance of {distances.flatten()[i]}")        
-            num.append(i)
-            name.append(movie_name)
-            distance.append(distances.flatten()[i])
-            rating.append(*movies_copy[movies_copy["title"] == movie_name]["user_rating"].values)
-    dic = {"Number": num, "Movie Name": name, "Rating": rating, "Distance": distance}
-    recommendation = pd.DataFrame(data=dic)
-    recommendation.set_index("Number", inplace=True)
-    return recommendation
 
-# figure out why distance = 0 for all
+# New collab funct with new data
+
+
+
+
+
+
+
+
+
+
+# Create function for collaborative recs
+def item_based_recommender(title, num_recs=10):
+    if title not in movies_pivot.index:
+        return f"Movie '{title}' not found in the dataset."
+
+    query_idx = movies_pivot.index.get_loc(title)
+    distances, indices = knn.kneighbors(movies_pivot.iloc[query_idx, :].values.reshape(1, -1), n_neighbors=num_recs + 1)
+
+    recommendations = []
+    for i in range(1, len(indices.flatten())):  # Skip the first (it’s the movie itself)
+        movie_name = movies_pivot.index[indices.flatten()[i]]
+        avg_rating = movies_merged[movies_merged["title"] == movie_name]["user_rating"].mean()
+        recommendations.append((movie_name, avg_rating, distances.flatten()[i]))
+
+    return pd.DataFrame(recommendations, columns=["Movie Name", "Avg Rating", "Distance"]).set_index("Movie Name")
+
