@@ -30,9 +30,7 @@ for page in range(1, total_pages + 1):
 movies_df = pd.DataFrame(all_movies)
 movies_df_uncleaned = movies_df.copy()
 movies_df_uncleaned.to_csv("movies_data_uncleaned.csv", index=False)
-
 movies_df = pd.DataFrame(all_movies)[['id', 'title']]
-movie_content_df = movies_df_uncleaned[['id', 'title', 'genre_ids', 'vote_average']]
 
 
 # Fetch reviews for each movie

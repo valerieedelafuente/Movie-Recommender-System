@@ -4,6 +4,7 @@ from scipy.sparse import csr_matrix
 from sklearn.neighbors import NearestNeighbors
 import random
 import numpy as np
+import ast
 
 # Join movies_df and movie_reviews_df and clean
 movies_merged = pd.merge(movies_df, movie_reviews_df, left_on='id', right_on='movie_id')
@@ -21,102 +22,43 @@ movies_matrix = csr_matrix(movies_pivot.values)
 knn = NearestNeighbors(metric = "cosine", algorithm = "brute")
 knn.fit(movies_matrix)
 
-### Stop running here and skip to bottom to run ###
-
-# Test it with one movie
-query_no = np.random.choice(movies_pivot.shape[0])
-distances, indices = knn.kneighbors(movies_pivot.iloc[query_no,:].values.reshape(1, -1), n_neighbors = 6)
-
-# Format recommendations
-num = []
-name = []
-distance = []
-rating = []
-
-for i in range(0, len(distances.flatten())):
-    if i == 0:
-        print(f"Recommendations for {movies_pivot.index[query_no]} viewers :\n")
-    else:
-        movie_name = movies_pivot.index[indices.flatten()[i]]
-        print(f"{i}: {movie_name} , with a distance of {distances.flatten()[i]}")        
-        num.append(i)
-        name.append(movie_name)
-        distance.append(distances.flatten()[i])
-        rating.append(*movies_copy[movies_copy["title"]==movies_pivot.index[indices.flatten()[i]]]["user_rating"].values)
-
-
-# Put into DataFrame
-dic = {"Number" : num, "Movie Name" : name, "Rating" : rating}
-recommendation = pd.DataFrame(data = dic)
-recommendation.set_index("Number", inplace = True)
-
-title = movies_pivot.index[query_no]
-
-# Create function for collaborative recs
-def collaborative_recommender(title, num_recs = 10):
-    # Make a copy of the movies dataframe to avoid modifying the original
-    movies_copy = movies_df.copy()
-    # Create a pivot table where rows are movie titles and columns are user IDs
-    movies_pivot = movies_copy.pivot_table(index="title", columns="user_id", values="user_rating").fillna(0)
-    # Create the compressed sparse row (CSR) matrix for the KNN model
-    movies_matrix = csr_matrix(movies_pivot.values)
-    # Fit the KNN model with cosine similarity
-    knn = NearestNeighbors(metric="cosine", algorithm="brute")
-    knn.fit(movies_matrix)
-    # Get the index of the movie in the pivot table
-    query_no = movies_pivot.index.get_loc(title)
-    # Get the nearest neighbors (movies similar to the input movie)
-    distances, indices = knn.kneighbors(movies_pivot.iloc[query_no,:].values.reshape(1, -1), n_neighbors=num_recs)
-    # Initialize lists to store the recommendations
-    num = []
-    name = []
-    distance = []
-    rating = []
-    # Format the recommendations
-    for i in range(0, len(distances.flatten())):
-        if i == 0:
-            print(f"Recommendations for {title} viewers:\n")
-        else:
-            movie_name = movies_pivot.index[indices.flatten()[i]]
-            print(f"{i}: {movie_name} , with a distance of {distances.flatten()[i]}")        
-            num.append(i)
-            name.append(movie_name)
-            distance.append(distances.flatten()[i])
-            rating.append(*movies_copy[movies_copy["title"] == movie_name]["user_rating"].values)
-    # Create a DataFrame to return the recommendations
-    dic = {"Number": num, "Movie Name": name, "Rating": rating, "Distance": distance}
-    recommendation = pd.DataFrame(data=dic)
-    recommendation.set_index("Number", inplace=True)
-    return recommendation
-
-
-
-
-
-# New collab funct with new data
-
-
-
-
-
-
-
-
-
+# Load movie content df
+movie_content_processed = pd.read_csv('data/movie_content_processed.csv')
+cols = ['movie_id', 'rating_average', 'genre_ids', 'watch_providers']
+movie_content = movie_content_processed[cols]
 
 # Create function for collaborative recs
 def item_based_recommender(title, num_recs=10):
     if title not in movies_pivot.index:
         return f"Movie '{title}' not found in the dataset."
-
+    
     query_idx = movies_pivot.index.get_loc(title)
     distances, indices = knn.kneighbors(movies_pivot.iloc[query_idx, :].values.reshape(1, -1), n_neighbors=num_recs + 1)
 
+    popular_streaming_services = [
+        'Netflix', 'Amazon Prime Video', 'Hulu', 'Disney+', 'Apple TV', 'HBO Max', 
+        'YouTube', 'Google Play Movies', 'Vudu', 'Peacock', 'Paramount+', 'Fandango Now',
+        'Max', 'Mubi', 'Amazon Video', 'Netflix basic with Ads', 'Hoopla']
+    
     recommendations = []
     for i in range(1, len(indices.flatten())):  # Skip the first (it’s the movie itself)
         movie_name = movies_pivot.index[indices.flatten()[i]]
-        avg_rating = movies_merged[movies_merged["title"] == movie_name]["user_rating"].mean()
-        recommendations.append((movie_name, avg_rating, distances.flatten()[i]))
+        movie_info = movie_content[movie_content['movie_id'] == movies_merged[movies_merged['title'] == movie_name]['movie_id'].iloc[0]]
+        if not movie_info.empty:
+            avg_rating = movie_info['rating_average'].iloc[0]
+            genre_ids = movie_info['genre_ids'].iloc[0]
+            genre_ids = ast.literal_eval(genre_ids)
+            genre_str = ", ".join(genre_ids)
+            watch_providers = movie_info['watch_providers'].iloc[0]
+            filtered_watch_providers = [provider.strip() for provider in watch_providers.split(',') if any(popular in provider for popular in popular_streaming_services)]
+            formatted_watch_providers = ", ".join(filtered_watch_providers)
+            recommendations.append((movie_name, genre_str, avg_rating, formatted_watch_providers))
+    print(f"🎬 Using matched movie: {title}\n")
+    print(f"📌 Top {num_recs} movies similar to '{title}':")
 
-    return pd.DataFrame(recommendations, columns=["Movie Name", "Avg Rating", "Distance"]).set_index("Movie Name")
+    for i, (movie_name, genre, rating, watch_providers) in enumerate(recommendations, start=1):
+        print(f"{i}. {movie_name} (Genre: {genre}, Rating: {rating})")
+        print(f"   📺 Where to stream: {watch_providers}")
+
+    return recommendations
 
