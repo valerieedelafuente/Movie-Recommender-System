@@ -1,0 +1,81 @@
+---
+title: "Movie Recommender System Project"
+authors: "Jiajia Feng, Tess Ivinjack, Leslie Cervantes Rivera, Valerie De La Fuente"
+date: 03-19-15
+editor: visual
+format: html
+code-copy: true
+execute:
+  message: false
+  warning: false
+  echo: false
+  cache: true
+---
+
+## Introduction
+
+### Objective
+
+This project aims to develop a movie recommendation system using data from The Movie Database (TMDb) API. By applying Python-based machine learning techniques, the system will analyze user preferences and suggest relevant movies. The goal is to create a personalized, efficient recommendation system that enhances content discovery for users.
+
+### Motivation
+
+In today's digital entertainment world, users are overwhelmed with content options, making personalized recommendations more essential than ever. Recommendation systems help by offering tailored suggestions, improving user engagement and satisfaction. With platforms like Netflix and Hulu relying on data-driven algorithms, effective recommendation systems are crucial in enhancing viewer experience. Using data from an API like TMDb, which includes extensive movie data, allows for more accurate and relevant content suggestions. This allows for a more engaging and relevant user experience, fostering deeper interaction with the platform and greater satisfaction with the recommendations provided.
+
+### Data Description
+
+### Methodology
+
+Briefly mention the key methods, tools, and datasets used.
+
+## Data Collection and Preparation
+
+### API Data Retrieval
+
+Describe the API used (e.g., TMDb), endpoints queried, and relevant data fields collected (e.g., genres, ratings, cast).
+
+### Data Cleaning
+
+Explain key preprocessing steps like handling missing values, formatting genre data, and transforming ratings.
+
+### Feature Engineering
+
+Describe features created for both content-based (e.g., TF-IDF for movie descriptions) and collaborative filtering (e.g., user-item matrices).
+
+## Modeling Approach
+
+### Content-Based Filtering
+
+-   Describe the method (e.g., cosine similarity using TF-IDF vectors or count vectors).
+
+-   Outline the steps to calculate similarity scores.
+
+-   Highlight key implementation details (e.g., efficient storage of vectors).
+
+### Collaborative Filtering
+
+-   Explain the technique (e.g., matrix factorization with Surprise library or k-nearest neighbors).
+
+-   Describe how user-item interactions are utilized.
+
+### Evaluation
+
+-   Describe performance metrics used (e.g., precision, recall, RMSE).
+
+-   Provide results with brief interpretation.
+
+## Results and Analysis
+
+-   Highlight key findings from both models.
+
+-   Compare the strengths and weaknesses of content-based and collaborative filtering approaches.
+
+-   Discuss any challenges faced (e.g., cold start problem) and how you addressed them.
+
+## Conclusion
+
+-   Summarize the project's achievements.
+
+-   Suggest potential improvements (e.g., hybrid models, enhanced data sources, or improved user interface).
+
+-   Mention real-world applications or extensions of the system.
