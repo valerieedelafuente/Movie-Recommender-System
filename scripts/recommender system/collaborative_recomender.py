@@ -6,6 +6,10 @@ import random
 import numpy as np
 import ast
 
+movies_df = pd.read_csv("data/movies_data.csv")
+movie_reviews_df = pd.read_csv("data/movie_reviews_data.csv")
+movie_content_df = pd.read_csv('data/movie_content_data.csv')
+
 # Join movies_df and movie_reviews_df and clean
 movies_merged = pd.merge(movies_df, movie_reviews_df, left_on='id', right_on='movie_id')
 columns = ['title', 'movie_id', 'user_id', 'user_rating']
@@ -23,7 +27,7 @@ knn = NearestNeighbors(metric = "cosine", algorithm = "brute")
 knn.fit(movies_matrix)
 
 # Load movie content df
-movie_content_processed = pd.read_csv('data/movie_content_processed.csv')
+movie_content_processed = pd.read_csv('/Users/tessivinjack/Documents/GitHub/Pstat134-Movie-Recommender-System/data/movie_content_processed.csv')
 cols = ['movie_id', 'rating_average', 'genre_ids', 'watch_providers']
 movie_content = movie_content_processed[cols]
 
