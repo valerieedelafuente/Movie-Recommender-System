@@ -3,6 +3,9 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import textwrap
 
+movie_content_df = pd.read_csv("/Users/lezelly/Desktop/movie_contents.csv")
+movie_reviews_df = pd.read_csv("/Users/lezelly/Desktop/movie_reviews.csv")
+
 missing_values = movie_content_df.isnull().sum()
 
 missing_values = missing_values[missing_values > 0]
@@ -43,6 +46,7 @@ sns.barplot(x = genre_counts.index[:10], y = genre_counts.values[:10], palette =
 plt.xticks(rotation = 45)
 plt.xlabel('Genre')
 plt.ylabel('Count')
+plt.title('Popular Genres')
 plt.subplots_adjust(bottom = .25)
 plt.show()
 
@@ -51,6 +55,7 @@ plt.figure(figsize = (12, 6))
 sns.countplot(y = 'original_language', data = movie_content_df, order = movie_content_df['original_language'].value_counts(ascending = False).index[:15])
 plt.xlabel('Count')
 plt.ylabel('Language')
+plt.title('Popular Movie Languages')
 plt.subplots_adjust(left = .25)
 plt.show()
 
@@ -64,8 +69,9 @@ plt.figure(figsize = (12, 6))
 sns.barplot(x = actors_count.values[:15], y = actors_count.index[:15], orient = 'h', color = "skyblue")
 plt.xlabel('Count')
 plt.ylabel('Actor')
+plt.title('Common Actors')
 plt.yticks(rotation = 0)
-plt.subplots_adjust(left = .25)
+plt.subplots_adjust(left = .3)
 plt.show()
 
 #separating providers and exploding
@@ -82,7 +88,7 @@ sns.barplot(x = provider_ratings.values[:15], y = provider_ratings.index[:15], c
 plt.xlabel('Count')
 plt.ylabel('Provider')
 plt.title('Which providers have the highest-rated movies?')
-plt.subplots_adjust(left = .35)
+plt.subplots_adjust(left = .4)
 plt.show()
 
 '''plt.figure(figsize = (12,6))

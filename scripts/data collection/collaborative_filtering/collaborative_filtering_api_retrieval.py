@@ -25,6 +25,7 @@ for page in range(1, total_pages + 1):
         break
 
     time.sleep(0.5)  # Prevent rate-limiting
+    print(page)
 
 # Convert movies to DataFrame
 movies_df = pd.DataFrame(all_movies)
@@ -81,7 +82,7 @@ for movie_id in movies_df["id"]:
         break  # Or handle it in another way
 
     time.sleep(0.5)
-    print(page)
+    
 
 # Convert reviews to DataFrame
 movie_reviews_df = pd.DataFrame(reviews_data)

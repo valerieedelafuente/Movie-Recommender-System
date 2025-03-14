@@ -42,6 +42,48 @@ Explain key preprocessing steps like handling missing values, formatting genre d
 
 Describe features created for both content-based (e.g., TF-IDF for movie descriptions) and collaborative filtering (e.g., user-item matrices).
 
+### EDA
+
+In this section, we are focusing on Exploratory Data Analysis (EDA) to better understand the data. This is the stage where we are given insights into the structure and characteristics of the data, for instance missing values.
+
+#### Missing Data
+
+![](images/clipboard-1834072139.png){width="307" height="424"}
+
+The dataset `movie_content_df` is missing some observations in `genre_ids`, `cast_names`, and `watch_providers`.
+
+![](images/clipboard-3610589772.png){width="323"}
+
+While in the `movie_reviews_df`, it is missing a majority of `user_rating`.
+
+#### Popular Genres
+
+![](images/clipboard-2075077829.png){width="323"}
+
+Redo
+
+#### Popular Movie Languages
+
+![](images/clipboard-3794390472.png){width="397"}
+
+We can see most of the languages in our dataset have the original language in English with a count of approximately 2,800. The following most popular languages are French and Japanese with a count of approximately 500 and 100.
+
+#### Popular Actors
+
+![](images/clipboard-1337669541.png){width="397"}
+
+As we can see "Jr." is the most common actor in our movie dataset with a count of approximately 85. We do not know who exactly "Jr." is, but we believe the name was cut when retrieving the data. Other actors such as Samuel L. Jackson, and Bruce Willis were also common with a count of approximately 45 and 42.
+
+#### Providers
+
+![](images/clipboard-50046222.png){width="453"}
+
+Our top provider is 'Sony Liv' which is a Indian subscription streaming service. This provider provides approximately 13,000 REDO
+
+#### Rating Average vs Vote Count
+
+![](images/clipboard-3306005980.png){width="453"}
+
 ## Modeling Approach
 
 ### Content-Based Filtering
