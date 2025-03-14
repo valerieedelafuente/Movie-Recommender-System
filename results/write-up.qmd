@@ -42,11 +42,31 @@ Explain key preprocessing steps like handling missing values, formatting genre d
 
 Describe features created for both content-based (e.g., TF-IDF for movie descriptions) and collaborative filtering (e.g., user-item matrices).
 
-### EDA
+## Exploratory Data Analysis (EDA)
 
-In this section, we are focusing on Exploratory Data Analysis (EDA) to better understand the data. This is the stage where we are given insights into the structure and characteristics of the data, for instance missing values.
+In this section, we are focusing on EDA to better understand the data. This is the stage where we are given insights into the structure and characteristics of the data, for instance missing values.
 
-#### Missing Data
+### Variables
+
+```{python}
+from prettytable import PrettyTable
+table = PrettyTable()
+table.field_names = ["Variable Name", "Description"]
+table.add_row(['movie_id', 'Unique identifier of the movie.'])
+table.add_row(['title', 'Title of the movie.'])
+table.add_row(['release_year', 'The year the movie was released.'])
+table.add_row(['genre_ids', 'List of genres associated with a movie.'])
+table.add_row(['original_language', 'Original language of the movie.'])
+table.add_row(['cast_names', 'List of actors in the movie.'])
+table.add_row(['watch_providers', 'Streaming platforms where the movie is available.'])
+table.add_row(['rating_average', 'A quantitative assessment of the overall quality of a movie.'])
+table.add_row(['vote_count', 'The total number of people who voted for the movie.'])
+table.add_row(['author', 'Unique identifier for the user.'])
+table.add_row(['user_rating', 'Rating given by user.'])
+print(table)
+```
+
+### Missing Data
 
 ![](images/clipboard-1834072139.png){width="307" height="424"}
 
@@ -58,13 +78,13 @@ While in the `movie_reviews_df`, it is missing a majority of `user_rating`.
 
 #### Popular Genres
 
-![](images/clipboard-2075077829.png){width="323"}
+![](images/clipboard-1866196344.png){width="394"}
 
-Redo
+About 1600 of movies mention Drama in their genre list. Comedy and Thriller are the next popular genres with approximately 1400 and 1000 counts.
 
 #### Popular Movie Languages
 
-![](images/clipboard-3794390472.png){width="397"}
+![](images/clipboard-1260077373.png){width="394"}
 
 We can see most of the languages in our dataset have the original language in English with a count of approximately 2,800. The following most popular languages are French and Japanese with a count of approximately 500 and 100.
 
@@ -76,13 +96,15 @@ As we can see "Jr." is the most common actor in our movie dataset with a count o
 
 #### Providers
 
-![](images/clipboard-50046222.png){width="453"}
+![](images/clipboard-3952843974.png){width="394"}
 
-Our top provider is 'Sony Liv' which is a Indian subscription streaming service. This provider provides approximately 13,000 REDO
+Our top providers are 'Apple TV', 'Google Play Movies', and 'Amazon Video'. They offer most of our movies in the dataset, offering approximately 3,000 movies.
 
-#### Rating Average vs Vote Count
+#### Reviewers
 
-![](images/clipboard-3306005980.png){width="453"}
+![](images/clipboard-577182410.png){width="394"}
+
+'CinemaSerf' is our top reviewer, reviewing approximately 300 movies. Following the author, 'r96sk' and 'Manuel São Bento' are the next top reviewers with approximately 170 and 110 movie reviews.
 
 ## Modeling Approach
 
