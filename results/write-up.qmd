@@ -110,11 +110,36 @@ Our top providers are 'Apple TV', 'Google Play Movies', and 'Amazon Video'. They
 
 ### Content-Based Filtering
 
--   Describe the method (e.g., cosine similarity using TF-IDF vectors or count vectors).
+Content-based filtering recommends movies based on their features rather than user interactions. We use TF-IDF vectorization to encode movie attributes and compute similarity using cosine similarity and linear kernel similarity.
 
--   Outline the steps to calculate similarity scores.
+**Implementation Steps:** \
+1. **Feature Engineering**
 
--   Highlight key implementation details (e.g., efficient storage of vectors).
+-   Combine `genre_ids`, `cast_names`, and `watch_providers` into a single text feature.
+
+2\. **TF-IDF Vectorization**
+
+-   Convert text features into numerical vectors.
+
+<!-- -->
+
+-    Use `min_df=2` to filter out infrequent terms.
+
+3\. **Computing Similarity**
+
+-    Use cosine similarity for text-based similarity.
+
+-    Integrate `rating_average` and `vote_count` with linear kernel similarity for better ranking.
+
+4\. **Recommendation System**
+
+-    Use fuzzy matching to correct user input.
+
+<!-- -->
+
+-   Retrieve and rank the most similar movies based on the similarity matrix.
+
+    ![Cosine Similarity Recommendation Results](images/Screenshot 2025-03-14 at 13.42.54.png)![]()
 
 ### Collaborative Filtering
 
