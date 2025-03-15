@@ -20,7 +20,7 @@ This project aims to develop a movie recommendation system using data from The M
 
 ### Motivation
 
-In today's digital entertainment world, users are overwhelmed with content options, making personalized recommendations more essential than ever. Recommendation systems help by offering tailored suggestions, improving user engagement and satisfaction. With platforms like Netflix and Hulu relying on data-driven algorithms, effective recommendation systems are crucial in enhancing viewer experience. Using data from an API like TMDb, which includes extensive movie data, allows for more accurate and relevant content suggestions. This allows for a more engaging and relevant user experience, fostering deeper interaction with the platform and greater satisfaction with the recommendations provided.
+In today's digital entertainment world, users are overwhelmed with content options, making personalized recommendations more essential than ever. Recommendation systems help by offering tailored suggestions, which improving user engagement and satisfaction. With platforms like Netflix and Hulu relying on data-driven algorithms, effective recommendation systems are crucial to enhancing viewer experience. Using data from an API like TMDb, which includes extensive movie data, allows for more accurate and relevant content suggestions. This allows for a more engaging and relevant user experience, fostering deeper interaction with the platform and greater satisfaction with the recommendations provided.
 
 ### Data Description
 
@@ -32,11 +32,11 @@ Briefly mention the key methods, tools, and datasets used.
 
 ### API Data Retrieval
 
-Describe the API used (e.g., TMDb), endpoints queried, and relevant data fields collected (e.g., genres, ratings, cast).
+#### Content-based filtering
 
 ```{python, eval=FALSE}
-# Code is displayed but not run
-# content_based_api_retrieval
+# Code is displayed but will not run
+# Loading necessary packages
 import requests
 import pandas as pd
 import time
@@ -100,17 +100,19 @@ for page in range(1, total_pages + 1):
     
 # Convert to DataFrame
 movie_content_df = pd.DataFrame(all_movies)
-
-
 ```
 
-### Data Cleaning
+#### Collaborative-based filtering
+
+## Data Cleaning and Feature Engineering
 
 Explain key preprocessing steps like handling missing values, formatting genre data, and transforming ratings.
 
-### Feature Engineering
-
 Describe features created for both content-based (e.g., TF-IDF for movie descriptions) and collaborative filtering (e.g., user-item matrices).
+
+### Content-based filtering
+
+### Collaborative-based filtering
 
 ## Exploratory Data Analysis (EDA)
 
@@ -182,7 +184,7 @@ Our top providers are 'Apple TV', 'Google Play Movies', and 'Amazon Video'. They
 
 Content-based filtering recommends movies based on their features rather than user interactions. We use TF-IDF vectorization to encode movie attributes and compute similarity using cosine similarity and linear kernel similarity.
 
-**Implementation Steps:** \
+**Implementation Steps:**\
 1. **Feature Engineering**
 
 -   Combine `genre_ids`, `cast_names`, and `watch_providers` into a single text feature.
@@ -193,23 +195,23 @@ Content-based filtering recommends movies based on their features rather than us
 
 <!-- -->
 
--    Use `min_df=2` to filter out infrequent terms.
+-   Use `min_df=2` to filter out infrequent terms.
 
 3\. **Computing Similarity**
 
--    Use cosine similarity for text-based similarity.
+-   Use cosine similarity for text-based similarity.
 
--    Integrate `rating_average` and `vote_count` with linear kernel similarity for better ranking.
+-   Integrate `rating_average` and `vote_count` with linear kernel similarity for better ranking.
 
 4\. **Recommendation System**
 
--    Use fuzzy matching to correct user input.
+-   Use fuzzy matching to correct user input.
 
 <!-- -->
 
 -   Retrieve and rank the most similar movies based on the similarity matrix.
 
-    ![Cosine Similarity Recommendation Results](images/Screenshot 2025-03-14 at 13.42.54.png)![]()
+    ![Cosine Similarity Recommendation Results](images/Screenshot%202025-03-14%20at%2013.42.54.png)![]()
 
 ### Collaborative Filtering
 
