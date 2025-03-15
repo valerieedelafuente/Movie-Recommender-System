@@ -22,13 +22,13 @@ This project aims to develop a movie recommendation system using data from The M
 
 In today's digital entertainment world, users are overwhelmed with content options, making personalized recommendations more essential than ever. Recommendation systems help by offering tailored suggestions, which improving user engagement and satisfaction. With platforms like Netflix and Hulu relying on data-driven algorithms, effective recommendation systems are crucial to enhancing viewer experience. Using data from an API like TMDb, which includes extensive movie data, allows for more accurate and relevant content suggestions. This allows for a more engaging and relevant user experience, fostering deeper interaction with the platform and greater satisfaction with the recommendations provided.
 
+### **Methodology**
+
+The movie recommendation system is implemented using Python and relies on data extracted from The Movie Database (TMDb) API to ensure access to the most up-to-date movie information. The system follows a hybrid approach using the cascade method, where content-based filtering is applied first to narrow down the dataset. This step filters movies based on their features, such as genres and other metadata, to identify those similar to a user’s interests.
+
+Once the dataset is refined, the filtered results are passed into the collaborative filtering script, which further analyzes patterns in user interactions to generate the final recommendations. By combining these two approaches, the system enhances recommendation accuracy and ensures that users receive relevant movie suggestions tailored to their preferences.
+
 ### Data Description
-
-### Methodology
-
-Briefly mention the key methods, tools, and datasets used.
-
-## Data Collection and Preparation
 
 ### API Data Retrieval
 
