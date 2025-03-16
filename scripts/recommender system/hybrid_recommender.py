@@ -200,45 +200,7 @@ def final_movie_recs(title):
 final_movie_recs("Companion")
 
 
-
-
-
-
-
-
-############
-title = 'Funny Games'
-top_100_movies = content_based_movie_recs(title, movie_content_df, cosine_sim, top_n=101)
-    
-movie_row = movie_content_df[movie_content_df["title"] == title]
-if not movie_row.empty:
-  movie_row = movie_row.copy()
-  #movie_row.loc[:, "movie_id"] = movie_row["id"]
-  top_100_movies = pd.concat([top_100_movies, movie_row], ignore_index=True)
-  top_100_movies = top_100_movies[['movie_id', 'title', 'genre_ids', 'rating_average']]
-
-
-movie_ids_set = set(top_100_movies["movie_id"])
-movies_subset = movies_df[movies_df["id"].isin(movie_ids_set)]
-reviews_subset = movie_reviews_df[movie_reviews_df["movie_id"].isin(movie_ids_set)]
-
-movies_merged = movies_subset.merge(reviews_subset, left_on="id", right_on="movie_id")
-
-movies_pivot = movies_merged.pivot_table(index="title",columns="user_id",values="user_rating").fillna(0)
-
-# Create Compressed Sparse Row (CSR) matrix
-movies_matrix = csr_matrix(movies_pivot.values)
-
-# Fit KNN model with cosine similarity as distance metric
-knn = NearestNeighbors(metric = "cosine", algorithm = "brute")
-knn.fit(movies_matrix)
-
-final_recommendations = collaborative_based_movie_recs(title, num_recs=10)
-
-print(movie_content_df[movie_content_df["title"] == "The Wrong Missy"])
-
-
-
+#################
 
 
 collab_ids = set(movies_df["id"])

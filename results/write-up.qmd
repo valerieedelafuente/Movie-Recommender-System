@@ -32,6 +32,8 @@ Once the dataset is refined, the filtered results are passed into the collaborat
 
 As aforementioned, the data is obtained using TMDb API. The data is extracted into two separate DataFrames, one content-based and one collaborative-based. The content-based DataFrame, `movie_content_df`, after undergoing all preprocessing and cleaning, includes the following variables: `movie_id`, `title`, `release_year`, `genre_ids`, `original_language`, `cast_names`, `watch_providers`, `rating_average`, and `vote_count`. The collaborative-based DataFrame, `movie_reviews_df`, after undergoing all preprocessing and cleaning, includes the following variables: `movie_id`, `user_rating`, and `user_id`.
 
+The `movie_content_df` has 4000 rows representing an observation for each of the 4000 unique movies. The `movie_reviews_df` has 9602 rows representing a user rating for 2540 unique movies.
+
 ### API Data Retrieval
 
 To use the TMDb API, users must create an account on [The Movie Database website](https://www.themoviedb.org/) and generate a personal authentication key. This key is required to authenticate API requests and obtain data. Content-based filtering and collborative-based filtering have their own respective data retrieval scripts. Both retrieval scripts include a delay between requests to avoid hitting TMDb's rate limit.
@@ -468,10 +470,6 @@ Content-based filtering recommends movies based on their features rather than us
 
 ### Collaborative Filtering
 
--   Explain the technique (e.g., matrix factorization with Surprise library or k-nearest neighbors).
-
--   Describe how user-item interactions are utilized.
-
 Collaborative filtering on the other hand is a method that recommends movies to users based on ratings. In this project, it looks at whatever movie the user is looking for recommendations for and suggests the top most similar movies with regard to how other users have rated it. So if two movies have been given very similar rating patterns from users, then they are likely to be recommended for each other. There is another kind of collaborative filtering, that instead compares the users ratings for other movies, and recommends movies that other users who have similar rating patterns to them had enjoyed, but since we only had access to past user ratings, this project focuses on the first kind of collaborative filtering.
 
 **Implementation Steps:**\
@@ -484,24 +482,40 @@ Collaborative filtering on the other hand is a method that recommends movies to 
 
 2\. **Fit K-Nearest Neighbors model**
 
--   Fit a KNN model that uses cosine similarity as the distance metric and the
+-   Fit a KNN model that uses cosine similarity as the distance metric
 -   Input is the Compressed Sparse Row (CSR) matrix of the user-item matrix
 
-3\. **COMPLETE THESE**
+3\. **Extract top n recommendations**
 
--   Use cosine similarity for text-based similarity.
+-   Given a movie title, KNN finds the top n movies with similar user ratings
 
--   Integrate `rating_average` and `vote_count` with linear kernel similarity for better ranking.
+-   Collects movie information like genre, rating, and where users can stream it
 
-4\. **Recommendation System**
-
--   Use fuzzy matching to correct user input.
+-   Prints the information for the user
 
 ### Hybrid Filtering System
 
--   talk about the cascade approach
+To incorporate both the content based and collaborative based recommender systems, a cascade approach is implemented here. This method effectively combines both recommender systems for movies that have reviews available in the dataset, in order to give the user a more complete and holistic movie recommendation.
 
--   how it starts with content then runs through collaborative if the movie has user reviews
+**Implementation Steps:**\
+1. **Extract top 100 content based recommendations**
+
+-   Using the `content_based_movie_recs` function, find the top 100 movies
+
+2\. **Check if movie has reviews**
+
+-   See if the movie id for the movie that recommendations are wanted for is in the reviews dataframe
+
+-   This tells us which branch of our pipeline to follow next
+
+3\. **If the movie has reviews**
+
+-   Feed the top 100 content based movie recommendations into `collaborative_based_movie_recs`
+-   Extract and display the top 10 user rating based movie recommendations for the user
+
+4\. **If the movie does not have reviews available**
+
+-   Display the top 10 content based movie recommendations for the user
 
 ### Evaluation
 
