@@ -55,8 +55,6 @@ def preprocessing(dataframe):
     # Select columns
     dataframe = dataframe[['movie_id', 'title', 'release_date', 'genre_ids', 'original_language', 'cast_names', 'watch_providers', 'rating_average', 'vote_count']]
     
-    ## more data preprocessing 
-    
     return dataframe
 
 

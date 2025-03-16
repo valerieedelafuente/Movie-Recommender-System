@@ -5,7 +5,7 @@ import time
 api_key = "d3e8d7fcb94be031986259192b4fdfb0"
 
 # Base URLs
-url = "https://api.themoviedb.org/3/movie/popular"
+popular_movies_url = "https://api.themoviedb.org/3/movie/popular"
 credits_url_template = "https://api.themoviedb.org/3/movie/{}/credits"
 providers_url_template = "https://api.themoviedb.org/3/movie/{}/watch/providers"
 
@@ -14,7 +14,7 @@ all_movies = []
 
 for page in range(1, total_pages + 1):
     parameters = {"api_key": api_key, "page": page}
-    response = requests.get(url, params=parameters)
+    response = requests.get(popular_movies_url, params=parameters)
     
     if response.status_code == 200:
         data = response.json()
@@ -62,3 +62,4 @@ for page in range(1, total_pages + 1):
 # Convert to DataFrame
 movie_content_df = pd.DataFrame(all_movies)
 
+movie_content_df.to_csv("movie_content_df.csv", index=False)
