@@ -141,11 +141,12 @@ all_movies = []
 
 # Fetch popular movies
 for page in range(1, total_pages + 1):
-    response = requests.get(popular_movies_url, params={"api_key": api_key, "page": page})
+    parameters = {"api_key": api_key, "page": page}
+    response = requests.get(popular_movies_url, params=parameters)
     
     if response.status_code == 200:
-        movies = response.json().get("results", [])
-        all_movies.extend(movies)
+        data = response.json()
+        all_movies.extend(data["results"])
     else:
         print("Error:", response.status_code)
         break
@@ -470,6 +471,37 @@ Content-based filtering recommends movies based on their features rather than us
 -   Explain the technique (e.g., matrix factorization with Surprise library or k-nearest neighbors).
 
 -   Describe how user-item interactions are utilized.
+
+Collaborative filtering on the other hand is a method that recommends movies to users based on ratings. In this project, it looks at whatever movie the user is looking for recommendations for and suggests the top most similar movies with regard to how other users have rated it. So if two movies have been given very similar rating patterns from users, then they are likely to be recommended for each other. There is another kind of collaborative filtering, that instead compares the users ratings for other movies, and recommends movies that other users who have similar rating patterns to them had enjoyed, but since we only had access to past user ratings, this project focuses on the first kind of collaborative filtering.
+
+**Implementation Steps:**\
+1. **Get user-item matrix**
+
+-   Pivot the `movies_merged` data frame which has information on movies and their ratings across different users
+    -   Every row represents a movie
+    -   Every column represents a reviewer
+    -   Values are the users rating of that movie
+
+2\. **Fit K-Nearest Neighbors model**
+
+-   Fit a KNN model that uses cosine similarity as the distance metric and the
+-   Input is the Compressed Sparse Row (CSR) matrix of the user-item matrix
+
+3\. **COMPLETE THESE**
+
+-   Use cosine similarity for text-based similarity.
+
+-   Integrate `rating_average` and `vote_count` with linear kernel similarity for better ranking.
+
+4\. **Recommendation System**
+
+-   Use fuzzy matching to correct user input.
+
+### Hybrid Filtering System
+
+-   talk about the cascade approach
+
+-   how it starts with content then runs through collaborative if the movie has user reviews
 
 ### Evaluation
 
