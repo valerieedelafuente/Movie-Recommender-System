@@ -658,9 +658,7 @@ def final_movie_recs(title):
 
 ### Evaluation
 
-It is difficult to evaluate the performance of these models since movie recommendations will be subjective, but as people who have a general understanding of movies, they look to be giving solid recommendations. For the content based approach, since we recommended based on movie genre,
-
--   Provide results with brief interpretation.
+It is difficult to evaluate the performance of these models since movie recommendations will be subjective, but as people who have a general understanding of movies, they look to be giving solid recommendations. For the content based approach, since we recommended based on movie genre, cast, and watch providers, the recommendations with generally be movies that fall under similar genres and casting. On the other hand, the collaborative based approach depends mostly on the user review data that you are working with. Since user reviews are all subjective to what the reviewer themself thinks, the movies that are recommended based on their reviews will change with the data that is given. Since there were only 1668 movies that had ample reviews and movie content data, that led to our hybrid recommender model pipeline including a more well rounded recommendation for those movies since we were able to incorporate the user rating aspect into those as well. But due to the gap in the datasets, a lot of movies will only get the content based recommendations for their top 10 most similar movies.
 
 ## Results and Analysis
 
