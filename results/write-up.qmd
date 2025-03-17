@@ -440,33 +440,189 @@ Our top providers are 'Apple TV', 'Google Play Movies', and 'Amazon Video'. They
 Content-based filtering recommends movies based on their features rather than user interactions. We use TF-IDF vectorization to encode movie attributes and compute similarity using cosine similarity and linear kernel similarity.
 
 **Implementation Steps:**\
-1. **Feature Engineering**
+1. **Cosine Similarity**
 
--   Combine `genre_ids`, `cast_names`, and `watch_providers` into a single text feature.
+-   Combine `genre_ids`, `cast_names`, and `watch_providers` into a single text feature
+-   Apply TF-IDF vectorization to convert text into numerical vectors
+-   Compute cosine similarity to measure the pairwise similarity between movies
 
-2\. **TF-IDF Vectorization**
+```{python}
+#| echo: false
+#| results: hide
 
--   Convert text features into numerical vectors.
+import pandas as pd
+file_path = "~/Desktop/Pstat134/Pstat134-Movie-Recommender-System/data_final/movie_contents copy.csv"
 
-<!-- -->
+movie_content_df = pd.read_csv(file_path)
+```
 
--   Use `min_df=2` to filter out infrequent terms.
+```{python}
+# Combine relevent features
+movie_content_df["combined_features"] = (
+    movie_content_df["genre_ids"].fillna("").str.replace(",", " ") + " | " +  
+    movie_content_df["cast_names"].fillna("").str.replace(",", " ") + " | " +  
+    movie_content_df["watch_providers"].fillna("").str.replace(",", " ")
+)
 
-3\. **Computing Similarity**
+# TF-IDF Vectorization
+from sklearn.feature_extraction.text import TfidfVectorizer
+tfidf_vectorizer = TfidfVectorizer(stop_words="english", min_df=2)
+tfidf_matrix = tfidf_vectorizer.fit_transform(movie_content_df["combined_features"])
+print("TF-IDF Matrix Shape:", tfidf_matrix.shape)
 
--   Use cosine similarity for text-based similarity.
+# Compute Cosine Similarity
+from sklearn.metrics.pairwise import cosine_similarity
+cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
+print("Cosine Similarity Matrix Shape:", cosine_sim.shape)
+print("Sample Cosine Similarity Scores:\n", cosine_sim[:5, :5])
+```
 
--   Integrate `rating_average` and `vote_count` with linear kernel similarity for better ranking.
+2\. **Linear Kernel Similarity**
 
-4\. **Recommendation System**
+-   Integrate `rating_average` and `vote_count` with linear kernel similarity
+-   Normalize numeric features and concatenate them with TF-IDF vectors
+-   Compute linear kernel similarity
 
--   Use fuzzy matching to correct user input.
+```{python}
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.preprocessing import MinMaxScaler
+import numpy as np
 
-<!-- -->
+# TF-IDF
+movie_content_df["combined_features"] = (
+    movie_content_df["genre_ids"].fillna("").str.replace(",", " ") + " | " +
+    movie_content_df["cast_names"].fillna("").str.replace(",", " ") + " | " +
+    movie_content_df["watch_providers"].fillna("").str.replace(",", " ")
+)
 
--   Retrieve and rank the most similar movies based on the similarity matrix.
+tfidf_vectorizer = TfidfVectorizer(stop_words="english", min_df=2)
+tfidf_matrix = tfidf_vectorizer.fit_transform(movie_content_df["combined_features"])
 
-    ![Cosine Similarity Recommendation Results](images/Screenshot%202025-03-14%20at%2013.42.54.png)![]()
+# add numeric features(need standardization)
+scaler = MinMaxScaler()
+numeric_features = movie_content_df[["rating_average", "vote_count"]].fillna(0)
+numeric_matrix = scaler.fit_transform(numeric_features)
+
+# integrate TFIDF and numeric features
+final_matrix = np.hstack((tfidf_matrix.toarray(), numeric_matrix))
+
+# Linear Kernel similarity
+from sklearn.metrics.pairwise import linear_kernel
+linear_sim = linear_kernel(final_matrix, final_matrix)
+
+print("Linear Kernel Similarity Matrix Shape:", linear_sim.shape)
+print("Sample Linear Kernel Similarity Scores:\n", linear_sim[:5, :5])
+
+```
+
+3\. **Movie Recommendation System**
+
+-   Fuzzy matching ensures accurate title recognition
+
+-   Retrieve the most similar movies using
+
+    -   **Cosine Similarity (text only)**
+    -   **Linear Kernel Similarity (text + numeric)**
+
+    ```{python}
+    from difflib import get_close_matches
+
+    def recommend_movies(movie_title, movie_content_df, cosine_sim, top_n=11):
+        # prepprocess input: remove space and lowercase
+        clean_title = movie_title.strip().lower()
+
+        # preprocess movie title
+        movie_content_df["clean_title"] = movie_content_df["title"].str.strip().str.lower()
+
+        # find the most similar movie
+        possible_matches = get_close_matches(clean_title, movie_content_df["clean_title"], n=1, cutoff=0.7)
+
+        
+        if possible_matches:
+            clean_title = possible_matches[0]
+
+        
+        movie_idx = movie_content_df[movie_content_df["clean_title"] == clean_title].index
+
+        if movie_idx.empty:
+            return f"Movie '{movie_title.strip()}' not found. Please check the title."
+
+
+        movie_idx = movie_idx[0]
+
+       
+        similarity_scores = list(enumerate(cosine_sim[movie_idx]))
+        similarity_scores = sorted(similarity_scores, key=lambda x: x[1], reverse=True)[1:top_n+1]
+
+       
+        top_movies = similarity_scores[1:top_n+1]
+
+        
+        recommendations = movie_content_df.iloc[[i[0] for i in top_movies]][["title", "genre_ids", "rating_average"]]
+
+        print(f"\n🎬 Using matched movie: {movie_content_df.iloc[movie_idx]['title']}")
+        print(f"\n📌 Top 10 movies similar to '{movie_title.strip()}':")
+        for i, row in enumerate(recommendations.itertuples(), start=1):
+            print(f"{i}. {row.title} (Genre: {row.genre_ids}, Rating: {row.rating_average})")
+
+        return recommendations
+
+    ```
+
+```{python}
+recommendations = recommend_movies("The Gorgee", movie_content_df, cosine_sim)
+recommendations = recommend_movies("Paprika", movie_content_df, cosine_sim)
+```
+
+```{python}
+from difflib import get_close_matches
+
+def recommend_movies_linear(movie_title, movie_content_df, linear_sim, top_n=10):
+    # prepprocess input: remove space and lowercase
+    clean_title = movie_title.strip().lower()
+
+    # preprocess movie title
+    movie_content_df["clean_title"] = movie_content_df["title"].str.strip().str.lower()
+
+    # find the most similar movie
+    possible_matches = get_close_matches(clean_title, movie_content_df["clean_title"], n=1, cutoff=0.7)
+
+
+    if possible_matches:
+        clean_title = possible_matches[0]
+    else:
+        return f"Movie '{movie_title.strip()}' not found. Please check the title."
+
+
+    movie_idx = movie_content_df[movie_content_df["clean_title"] == clean_title].index
+    if movie_idx.empty:
+        return f"Movie '{movie_title.strip()}' not found. Please check the title."
+
+    movie_idx = movie_idx[0]
+
+
+    similarity_scores = list(enumerate(linear_sim[movie_idx]))
+    similarity_scores = sorted(similarity_scores, key=lambda x: x[1], reverse=True)
+
+    # Top 10
+    top_movies = similarity_scores[1:top_n+1]
+
+  
+    recommendations = movie_content_df.iloc[[i[0] for i in top_movies]][["title", "genre_ids", "rating_average"]]
+
+    print(f"\n🎬 Using matched movie: {movie_content_df.iloc[movie_idx]['title']}")
+    print(f"\n📌 Top 10 movies similar to '{movie_title.strip()}':")
+    for i, row in enumerate(recommendations.itertuples(), start=1):
+        print(f"{i}. {row.title} (Genre: {row.genre_ids}, Rating: {row.rating_average})")
+
+    return recommendations
+
+```
+
+```{python}
+recommended_movies_linear = recommend_movies_linear("The Gorgee", movie_content_df, linear_sim)
+recommended_movies_linear = recommend_movies_linear("paprika", movie_content_df, linear_sim)
+```
 
 ### Collaborative Filtering
 
