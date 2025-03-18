@@ -624,7 +624,9 @@ recommended_movies_linear = recommend_movies_linear("The Gorgee", movie_content_
 recommended_movies_linear = recommend_movies_linear("paprika", movie_content_df, linear_sim)
 ```
 
-### Collaborative Filtering
+The cosine similarity method is effective in capturing textual feature similarity, making it ideal for recommending movies with similar genres, cast, or streaming providers. However, it does not incorporate numerical factors such as popularity. The linear kernel similarity method, on the other hand, integrates rating_average and vote_count, leading to more balanced recommendations that consider both textual and numerical attributes.
+
+###   Collaborative Filtering
 
 Collaborative filtering on the other hand is a method that recommends movies to users based on ratings. In this project, it looks at whatever movie the user is looking for recommendations for and suggests the top most similar movies with regard to how other users have rated it. So if two movies have been given very similar rating patterns from users, then they are likely to be recommended for each other. There is another kind of collaborative filtering, that instead compares the users ratings for other movies, and recommends movies that other users who have similar rating patterns to them had enjoyed, but since we only had access to past user ratings, this project focuses on the first kind of collaborative filtering.
 
@@ -842,6 +844,10 @@ It is difficult to evaluate the performance of these models since movie recommen
 
 -   Discuss any challenges faced (e.g., cold start problem) and how you addressed them.
 
+-   **Content-Based Filtering**
+
+    -   Our content-based recommendation system produces results using cosine similarity and linear kernel similarity, each with distinct advantages. Cosine similarity, which relies solely on text-based features like genres and cast, tends to recommend movies with similar themes and stylistic elements. In contrast, linear kernel similarity, which incorporates numerical features like rating_average and vote_count, generates recommendations that balance thematic similarity with popularity. One challenge we encountered was the cold start problem—movies with missing metadata or low visibility were harder to match accurately. To mitigate this, we ensured that movies without cast or provider information still had their genres factored into similarity calculations. However, content-based filtering remains limited in personalization since it does not account for user preferences. A potential improvement would be to integrate collaborative filtering to enhance recommendation diversity.
+
 ## Conclusion
 
 -   Summarize the project's achievements.
@@ -849,3 +855,5 @@ It is difficult to evaluate the performance of these models since movie recommen
 -   Suggest potential improvements (e.g., hybrid models, enhanced data sources, or improved user interface).
 
 -   Mention real-world applications or extensions of the system.
+
+We built a content-based filtering system that recommends movies based on their attributes rather than user interactions. Using TF-IDF vectorization, we transformed movie metadata into numerical representations and applied cosine similarity and linear kernel similarity to measure similarity. The model effectively finds movies with similar genres and cast but has some limitations. The cold start problem makes it harder to recommend movies with little metadata, and the system doesn’t adapt to individual user preferences. Possible improvements include adding more features like directors and plot summaries or refining feature weights to improve similarity scoring. While content-based filtering works well, combining it with collaborative filtering could make recommendations more personalized and diverse.
