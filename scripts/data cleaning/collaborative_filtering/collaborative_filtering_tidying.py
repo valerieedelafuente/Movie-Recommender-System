@@ -1,5 +1,5 @@
-movies_df = pd.read_csv("movies_data.csv")
-movie_reviews_df = pd.read_csv("movie_reviews_data.csv")
+movies_df = pd.read_csv("data/movies_data.csv")
+movie_reviews_df = pd.read_csv("data/movie_reviews_data.csv")
 
 # Tidying `user_id`
 # Creating a `user_id` column

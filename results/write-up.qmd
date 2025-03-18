@@ -26,13 +26,13 @@ In today's digital entertainment world, users are overwhelmed with content optio
 
 The movie recommendation system is implemented using Python and relies on data extracted from The Movie Database (TMDb) API to ensure access to the most up-to-date movie information. The system follows a hybrid approach using the cascade method, where content-based filtering is applied first to narrow down the dataset. This step filters movies based on their features, such as genres and other content-based movie information, to identify those similar to a user’s interests.
 
-Once the dataset is refined, the filtered results are passed into the collaborative filtering script if there is movie review data available for that film, which further analyzes patterns in user interactions to generate the final recommendations. By combining these two approaches, the system enhances recommendation accuracy and ensures that users receive relevant movie suggestions tailored to their preferences.
+Once the dataset is refined, the filtered results are passed into the collaborative filtering script, if there is movie review data available for that film, which further analyzes patterns in user interactions to generate the final recommendations. By combining these two approaches, the system enhances recommendation accuracy and ensures that users receive relevant movie suggestions tailored to their preferences.
 
 ### Data Description
 
 As aforementioned, the data is obtained using TMDb API. The data is extracted into two separate DataFrames, one content-based and one collaborative-based. The content-based DataFrame, `movie_content_df`, after undergoing all preprocessing and cleaning, includes the following variables: `movie_id`, `title`, `release_year`, `genre_ids`, `original_language`, `cast_names`, `watch_providers`, `rating_average`, and `vote_count`. The collaborative-based DataFrame, `movie_reviews_df`, after undergoing all preprocessing and cleaning, includes the following variables: `movie_id`, `user_rating`, and `user_id`. This DataFrame of movie reviews is also merged with `movies_df` to build the collaborative based recommender, which is just selecting a subset of the columns from `movie_content_df`. These columns are `movie_id`, `title`, `release_year`, `genre_ids`, `original_language`, and `vote_count`.
 
-The `movie_content_df` has 4000 rows representing an observation for each of the 4000 unique movies. The `movie_reviews_df` has 9602 rows representing a user rating for 2540 unique movies. Due to time and computing power limitations on our local computers, we weren't able to retrieve more than this amount of movie reviews, which results in there being 1668 unique movies that are in both the `movie_content_df` and the `movie_reviews_df`, and 2332 movies that we have content information on, but no user reviews. This discrepancy between the datasets is what lead us to the pipeline that we have for our hybrid recommender approach, which will be further explained later on.
+The `movie_content_df` has 4,000 rows representing an observation for each of the 4,000 unique movies. The `movie_reviews_df` has 9,602 rows representing a user rating for 2,540 unique movies. Due to time and computing power limitations on our local computers, we weren't able to retrieve more than this amount of movie reviews, which results in there being 1,668 unique movies that are in both the `movie_content_df` and the `movie_reviews_df`, and 2,332 movies that we have content information on, but no user reviews. This discrepancy between the datasets is what lead to the pipeline that was implemented for the hybrid recommender approach, which will be explained in further detail later on.
 
 ### API Data Retrieval
 
@@ -196,6 +196,8 @@ The system queries the following TMDb API endpoints to gather relevant movie dat
 
 ## Data Cleaning and Feature Engineering
 
+After extracting all of the data from the online database, there are some preprocessing steps to be done so that the data is clean and in the correct format to move forward with the recommender system implementation. Each DataFrame has their own script for the tidying that is necessary.
+
 ### Content-based filtering
 
 ```{python}
@@ -232,6 +234,16 @@ else:
 The first step in preprocessing the content-based data is to create a dictionary that maps the genre identification numbers to its corresponding genre category.
 
 ```{python}
+#| echo: false
+#| results: hide
+
+movie_reviews_df = pd.read_csv('../data/movie_reviews_data.csv')
+movie_content_df = pd.read_csv('../data/movie_content_df.csv')
+movies_df = pd.read_csv('../data/movies_data.csv')
+pd.options.mode.chained_assignment = None
+```
+
+```{python}
 # Load necessary packages
 import pandas as pd
 import ast
@@ -266,7 +278,7 @@ The code chunk above applies the genre dictionary to extract genre categories. I
 import pandas as pd
 import pycountry # for languages convertion
 import pandas as pd
-
+movie_content_df.columns
 # Tidying `genre_ids` 
 def clean_genre_ids(value):
     if isinstance(value, list):  # If it's already a list, clean and join
@@ -358,7 +370,7 @@ def genre_preprocessing(dataframe):
     
 def collab_preproccesing(dataframe):
       # Format genre_ids
-      movies_df = genre_preprocessing(movies_df)
+      dataframe = genre_preprocessing(dataframe)
       
       # Select necessary columns
       dataframe = dataframe[['id', 'title', 'release_date', 'genre_ids', 'original_language', 'vote_count']]
@@ -566,7 +578,7 @@ print("Sample Linear Kernel Similarity Scores:\n", linear_sim[:5, :5])
     ```{python}
     from difflib import get_close_matches
 
-    def recommend_movies(movie_title, movie_content_df, cosine_sim, top_n=11):
+    def content_based_movie_recs(movie_title, movie_content_df, cosine_sim, top_n=11):
         # prepprocess input: remove space and lowercase
         clean_title = movie_title.strip().lower()
 
@@ -609,14 +621,14 @@ print("Sample Linear Kernel Similarity Scores:\n", linear_sim[:5, :5])
     ```
 
 ```{python}
-recommendations = recommend_movies("The Gorgee", movie_content_df, cosine_sim)
-recommendations = recommend_movies("Paprika", movie_content_df, cosine_sim)
+recommendations1 = content_based_movie_recs("The Gorgee", movie_content_df, cosine_sim)
+recommendations2 = content_based_movie_recs("Paprika", movie_content_df, cosine_sim)
 ```
 
 ```{python}
 from difflib import get_close_matches
 
-def recommend_movies_linear(movie_title, movie_content_df, linear_sim, top_n=10):
+def content_based_movie_recs_linear(movie_title, movie_content_df, linear_sim, top_n=10):
     # prepprocess input: remove space and lowercase
     clean_title = movie_title.strip().lower()
 
@@ -659,11 +671,11 @@ def recommend_movies_linear(movie_title, movie_content_df, linear_sim, top_n=10)
 ```
 
 ```{python}
-recommended_movies_linear = recommend_movies_linear("The Gorgee", movie_content_df, linear_sim)
-recommended_movies_linear = recommend_movies_linear("paprika", movie_content_df, linear_sim)
+recommended_movies_linear1 = content_based_movie_recs_linear("The Gorgee", movie_content_df, linear_sim)
+recommended_movies_linear2 = content_based_movie_recs_linear("paprika", movie_content_df, linear_sim)
 ```
 
-The cosine similarity method is effective in capturing textual feature similarity, making it ideal for recommending movies with similar genres, cast, or streaming providers. However, it does not incorporate numerical factors such as popularity. The linear kernel similarity method, on the other hand, integrates rating_average and vote_count, leading to more balanced recommendations that consider both textual and numerical attributes.
+The cosine similarity method is effective in capturing textual feature similarity, making it ideal for recommending movies with similar genres, cast, or streaming providers. However, it does not incorporate numerical factors such as popularity. The linear kernel similarity method, on the other hand, integrates `rating_average` and `vote_count`, leading to more balanced recommendations that consider both textual and numerical attributes.
 
 ### Collaborative Filtering
 
@@ -693,16 +705,28 @@ Collaborative filtering on the other hand is a method that recommends movies to 
 ```{python}
 #| echo: false
 #| results: hide
-reviews = pd.read_csv('/Users/tessivinjack/Documents/GitHub/Pstat134-Movie-Recommender-System/data/movie_reviews_data.csv')
-content = pd.read_csv("/Users/tessivinjack/Documents/GitHub/Pstat134-Movie-Recommender-System/data_final/movie_contents copy.csv")
-movies_df = pd.read_csv("/Users/tessivinjack/Documents/GitHub/Pstat134-Movie-Recommender-System/data/movies_data.csv")
+movie_reviews_df = pd.read_csv('../data/movie_reviews_data.csv')
+movie_content_df = pd.read_csv('../data/movie_content_processed.csv')
+movies_df = pd.read_csv('../data/movies_data.csv')
+pd.options.mode.chained_assignment = None
+```
 
-movies_merged = pd.merge(movies_df, reviews, left_on='id', right_on='movie_id')
+```{python}
+# Join the movies and reviews dataframes
+movies_merged = pd.merge(movies_df, movie_reviews_df, left_on='id', right_on='movie_id')
+
+# Pivot so that rows are movies, columns are a user, and values are ratings
 movies_pivot = movies_merged.pivot_table(index="title",columns="id",values="user_rating").fillna(0)
+
+# Create Compressed Sparse Row (CSR) matrix
 movies_matrix = csr_matrix(movies_pivot.values)
+
+# Fit KNN model with cosine similarity as distance metric
 knn = NearestNeighbors(metric = "cosine", algorithm = "brute")
 knn.fit(movies_matrix)
 ```
+
+The code above executes steps one and two of the collaborative recommendation. It prepares the data to be fit by a K Nearest Neighbors model by transforming it into a CSR user-item matrix, and then proceeds to fit the model.
 
 ```{python}
 def collaborative_based_movie_recs(title, movies_pivot, movies_merged, knn, num_recs=10):
@@ -736,7 +760,7 @@ def collaborative_based_movie_recs(title, movies_pivot, movies_merged, knn, num_
             # Convert genre ids to lists and join to make a string
             if isinstance(genre_ids, str):
                 genre_ids = eval(genre_ids)
-            genre_str = ", ".join(genre_ids)
+            genre_str = ", ".join(map(str, genre_ids))
             
             # Collect watch provider information for each movie
             watch_providers = movie_info['watch_providers'].iloc[0]
@@ -759,9 +783,13 @@ def collaborative_based_movie_recs(title, movies_pivot, movies_merged, knn, num_
         print()
 ```
 
+The function above takes in a movie title, and prints out the top 10 movies that are most similar to that input movie based on user rating patterns. Let's try out this function on the best picture winner from this years Oscars.
+
 ```{python}
 collaborative_based_movie_recs('Anora', movies_pivot, movies_merged, knn, num_recs=10)
 ```
+
+As you can see, the genres and other content based features of the movies might not line up because this recommendation system is not based on what the movie is actually about. It is recommending movies based on how different users rated it, so they could be very different movies, but still get similar numeric ratings across users.
 
 ### Hybrid Filtering System
 
@@ -871,21 +899,25 @@ def final_movie_recs(title):
     return final_recommendations
 ```
 
+The function defined above will retrieve the final top 10 movie recommendations for a given movie, based on content and reviews if that data is present. Let's see what results we get for the same movie as before.
+
+```{python}
+final_movie_recs("Anora")
+```
+
+These top ten recommendations are different than the collaborative and content based recommendations for this movie because now it is using a combination of the two recommender systems. It begins by narrowing down from a list of 4,000 movies to only the top 100 that have similar genres, casts, and watch providers. From there, those top 100 are filtered down to the top 10 movies that were rated similar to Anora.
+
 ### Evaluation
 
 It is difficult to evaluate the performance of these models since movie recommendations will be subjective, but as people who have a general understanding of movies, they look to be giving solid recommendations. For the content based approach, since we recommended based on movie genre, cast, and watch providers, the recommendations with generally be movies that fall under similar genres and casting. On the other hand, the collaborative based approach depends mostly on the user review data that you are working with. Since user reviews are all subjective to what the reviewer themself thinks, the movies that are recommended based on their reviews will change with the data that is given. Since there were only 1668 movies that had ample reviews and movie content data, that led to our hybrid recommender model pipeline including a more well rounded recommendation for those movies since we were able to incorporate the user rating aspect into those as well. But due to the gap in the datasets, a lot of movies will only get the content based recommendations for their top 10 most similar movies.
 
 ## Results and Analysis
 
--   Highlight key findings from both models.
+Our content-based recommendation system produces results using cosine similarity and linear kernel similarity, each with distinct advantages. Cosine similarity, which relies solely on text-based features like genres and cast, tends to recommend movies with similar themes and stylistic elements. In contrast, linear kernel similarity, which incorporates numerical features like `rating_average` and `vote_count`, generates recommendations that balance thematic similarity with popularity. One challenge we encountered was the cold start problem—movies with missing metadata or low visibility were harder to match accurately. To mitigate this, we ensured that movies without cast or provider information still had their genres factored into similarity calculations. However, content-based filtering remains limited in personalization since it does not account for user preferences.
 
--   Compare the strengths and weaknesses of content-based and collaborative filtering approaches.
+To improve upon our content based recommendations, we also implement a collaborative based recommender system. The strengths of this method compared to content based are that it can give more nuanced recommendations beyond just having the same genre or same lead actor. It can suggest a movie for a user even if the content features of the movie do not line up. For example, if a group of users really love one movie because maybe it is really artistic, they might rate a movie of a completely different genre high as well due to its artistry, which would warrant a recommendation. The weaknesses of this system are the data that the model is trained on because it needs to be very representative of all users across all different types of movies, and ideally have ample reviews for each movie and each user. With better data, come better recommendations for each movie because there is more to be known about how different users received these movies compared to other ones.
 
--   Discuss any challenges faced (e.g., cold start problem) and how you addressed them.
-
--   **Content-Based Filtering**
-
-    -   Our content-based recommendation system produces results using cosine similarity and linear kernel similarity, each with distinct advantages. Cosine similarity, which relies solely on text-based features like genres and cast, tends to recommend movies with similar themes and stylistic elements. In contrast, linear kernel similarity, which incorporates numerical features like rating_average and vote_count, generates recommendations that balance thematic similarity with popularity. One challenge we encountered was the cold start problem—movies with missing metadata or low visibility were harder to match accurately. To mitigate this, we ensured that movies without cast or provider information still had their genres factored into similarity calculations. However, content-based filtering remains limited in personalization since it does not account for user preferences. A potential improvement would be to integrate collaborative filtering to enhance recommendation diversity.
+To get the best of both worlds for the finalized recommender system, we implemented a hybrid cascade approach that was able to integrate both content and collaborative based recommendations. This system will give the most well rounded recommendations because it is taking into account content features of the film, as well as how users rated it. The drawbacks to this approach are that not every single movie that has content data also has user rating data. Of the 4,000 unique movies in `movies_df`, only 1,668 of them also had data on their reviews. This led to the partially cascade approach of the finalized recommender system, which included collaborative recommendations for the movies that had ample review data. In the future, we could ideally collect enough user rating data to span across all movies in the content DataFrame so that the final hybrid recommendation was able to take both methods into account.
 
 ## Conclusion
 
@@ -895,4 +927,4 @@ It is difficult to evaluate the performance of these models since movie recommen
 
 -   Mention real-world applications or extensions of the system.
 
-We built a content-based filtering system that recommends movies based on their attributes rather than user interactions. Using TF-IDF vectorization, we transformed movie metadata into numerical representations and applied cosine similarity and linear kernel similarity to measure similarity. The model effectively finds movies with similar genres and cast but has some limitations. The cold start problem makes it harder to recommend movies with little metadata, and the system doesn’t adapt to individual user preferences. Possible improvements include adding more features like directors and plot summaries or refining feature weights to improve similarity scoring. While content-based filtering works well, combining it with collaborative filtering could make recommendations more personalized and diverse.
+We built a content-based filtering system that recommends movies based on their attributes rather than user interactions. Using TF-IDF vectorization, we transformed movie metadata into numerical representations and applied cosine similarity and linear kernel similarity to measure similarity. The model effectively finds movies with similar genres and cast but has some limitations such as inability to suggest nuanced recommendations. We also implemented a collaborative based filtering system that took into account movies that had gotten similar rating patterns by different users. The two models were then combined to create a hybrid cascade recommender system that could give well rounded and diverse recommendations for users based on a movie that they want recommendations for. To improve upon the model we created, we could include other content features like directors, producers, or use Natural Language Processing to analyze the movie summary or user reviews. We also could look into refining feature weights so that certain aspects are taken into account more than others, and also acquiring data about the user seeking recommendations so the system can offer a more personalized list of recommendations. Overall, these recommender systems effectively produce movie recommendations based on both content and user ratings, but improvements could be made for the future to offer more personalized and nuanced recommendations.

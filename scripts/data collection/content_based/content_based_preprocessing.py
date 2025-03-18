@@ -15,7 +15,6 @@ def genre_preprocessing(dataframe):
     
     return dataframe
 
-
 def content_preprocessing(dataframe):
       # Format genre_ids
       dataframe = genre_preprocessing(dataframe)
@@ -31,13 +30,14 @@ movie_content_df = content_preprocessing(movie_content_df)
     
 def collab_preproccesing(dataframe):
       # Format genre_ids
-      movies_df = genre_preprocessing(movies_df)
+      dataframe = genre_preprocessing(dataframe)
       
       # Select necessary columns
       dataframe = dataframe[['id', 'title', 'release_date', 'genre_ids', 'original_language', 'vote_count']]
-      
+
       return dataframe
 
 # Apply the preprocessing function
 movies_df = collab_preproccesing(movies_df)
+
 
