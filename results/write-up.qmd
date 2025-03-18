@@ -650,6 +650,20 @@ Collaborative filtering on the other hand is a method that recommends movies to 
 -   Prints the information for the user
 
 ```{python}
+#| echo: false
+#| results: hide
+reviews = pd.read_csv('/Users/tessivinjack/Documents/GitHub/Pstat134-Movie-Recommender-System/data/movie_reviews_data.csv')
+content = pd.read_csv("/Users/tessivinjack/Documents/GitHub/Pstat134-Movie-Recommender-System/data_final/movie_contents copy.csv")
+movies_df = pd.read_csv("/Users/tessivinjack/Documents/GitHub/Pstat134-Movie-Recommender-System/data/movies_data.csv")
+
+movies_merged = pd.merge(movies_df, reviews, left_on='id', right_on='movie_id')
+movies_pivot = movies_merged.pivot_table(index="title",columns="id",values="user_rating").fillna(0)
+movies_matrix = csr_matrix(movies_pivot.values)
+knn = NearestNeighbors(metric = "cosine", algorithm = "brute")
+knn.fit(movies_matrix)
+```
+
+```{python}
 def collaborative_based_movie_recs(title, movies_pivot, movies_merged, knn, num_recs=10):
     # Check if movie is within dataset
     if title not in movies_pivot.index:
@@ -702,6 +716,10 @@ def collaborative_based_movie_recs(title, movies_pivot, movies_merged, knn, num_
         print(f"{i}. {movie_name} (Genre: {genre}, Rating: {rating})")
         print(f"   📺 Where to stream: {watch_providers}")
         print()
+```
+
+```{python}
+collaborative_based_movie_recs('Anora', movies_pivot, movies_merged, knn, num_recs=10)
 ```
 
 ### Hybrid Filtering System
