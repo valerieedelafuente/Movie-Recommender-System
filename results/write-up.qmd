@@ -234,16 +234,27 @@ The first step in preprocessing the content-based data is to create a dictionary
 ```{python}
 # Load necessary packages
 import pandas as pd
+import ast
 
-def preprocessing(dataframe):
+def genre_preprocessing(dataframe):
+    # Convert genre_ids to lists
+    dataframe['genre_ids'] = dataframe['genre_ids'].apply(ast.literal_eval)
+    
     # Map genre_ids to genre names
     dataframe['genre_ids'] = dataframe['genre_ids'].apply(lambda x: [genre_dict[genre_id] for genre_id in x])
     
-    # Select columns
-    dataframe = dataframe[['movie_id', 'title', 'release_date', 'genre_ids', 'original_language', 'cast_names', 'watch_providers', 'rating_average', 'vote_count']]
-    
     return dataframe
 
+
+def content_preprocessing(dataframe):
+      # Format genre_ids
+      dataframe = genre_preprocessing(dataframe)
+    
+      # Select necessary columns
+      dataframe = dataframe[['movie_id', 'title', 'release_date', 'genre_ids', 'original_language', 'cast_names', 'watch_providers', 'rating_average', 'vote_count']]
+      
+      return dataframe
+    
 # Apply the preprocessing function
 movie_content_df = preprocessing(movie_content_df)
 ```
@@ -331,6 +342,34 @@ The following edits were made in the code chunk above:
 -   Missing values are retained in the DataFrame
 
 ### Collaborative-based filtering
+
+```{python}
+import pandas as pd
+import ast
+
+def genre_preprocessing(dataframe):
+    # Convert genre_ids to lists
+    dataframe['genre_ids'] = dataframe['genre_ids'].apply(ast.literal_eval)
+    
+    # Map genre_ids to genre names
+    dataframe['genre_ids'] = dataframe['genre_ids'].apply(lambda x: [genre_dict[genre_id] for genre_id in x])
+    
+    return dataframe
+    
+def collab_preproccesing(dataframe):
+      # Format genre_ids
+      movies_df = genre_preprocessing(movies_df)
+      
+      # Select necessary columns
+      dataframe = dataframe[['id', 'title', 'release_date', 'genre_ids', 'original_language', 'vote_count']]
+      
+      return dataframe
+
+# Apply the preprocessing function
+movies_df = collab_preproccesing(movies_df)
+```
+
+To begin for the collaborative based preprocessing, a similar pipeline to what was used for content based is followed. The genre ids are mapped to genres names and the relevant columns are retained.
 
 ```{python}
 # Creating a `user_id` column
@@ -626,7 +665,7 @@ recommended_movies_linear = recommend_movies_linear("paprika", movie_content_df,
 
 The cosine similarity method is effective in capturing textual feature similarity, making it ideal for recommending movies with similar genres, cast, or streaming providers. However, it does not incorporate numerical factors such as popularity. The linear kernel similarity method, on the other hand, integrates rating_average and vote_count, leading to more balanced recommendations that consider both textual and numerical attributes.
 
-###   Collaborative Filtering
+### Collaborative Filtering
 
 Collaborative filtering on the other hand is a method that recommends movies to users based on ratings. In this project, it looks at whatever movie the user is looking for recommendations for and suggests the top most similar movies with regard to how other users have rated it. So if two movies have been given very similar rating patterns from users, then they are likely to be recommended for each other. There is another kind of collaborative filtering, that instead compares the users ratings for other movies, and recommends movies that other users who have similar rating patterns to them had enjoyed, but since we only had access to past user ratings, this project focuses on the first kind of collaborative filtering.
 
