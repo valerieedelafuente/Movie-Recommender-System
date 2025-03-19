@@ -427,62 +427,160 @@ In this section, we are focusing on EDA to better understand the data. This is t
 ### Variables
 
 ```{python}
-from prettytable import PrettyTable
-table = PrettyTable()
-table.field_names = ["Variable Name", "Description"]
-table.add_row(['movie_id', 'Unique identifier of the movie.'])
-table.add_row(['title', 'Title of the movie.'])
-table.add_row(['release_year', 'The year the movie was released.'])
-table.add_row(['genre_ids', 'List of genres associated with a movie.'])
-table.add_row(['original_language', 'Original language of the movie.'])
-table.add_row(['cast_names', 'List of actors in the movie.'])
-table.add_row(['watch_providers', 'Streaming platforms where the movie is available.'])
-table.add_row(['rating_average', 'A quantitative assessment of the overall quality of a movie.'])
-table.add_row(['vote_count', 'The total number of people who voted for the movie.'])
-table.add_row(['author', 'Unique identifier for the user.'])
-table.add_row(['user_rating', 'Rating given by user.'])
-print(table)
+from rich.console import Console
+from rich.table import Table
+
+console = Console()
+
+table = Table(title = "Movie Dataset Variables", show_lines = True)
+
+table.add_column("Variable Name", style = "cyan", justify = "left")
+table.add_column("Description", style = "magenta", justify = "left")
+
+table.add_row('movie_id', 'Unique identifier of the movie.')
+table.add_row('title', 'Title of the movie.')
+table.add_row('release_year', 'The year the movie was released.')
+table.add_row('genre_ids', 'List of genres associated with a movie.')
+table.add_row('original_language', 'Original language of the movie.')
+table.add_row('cast_names', 'List of actors in the movie.')
+table.add_row('watch_providers', 'Streaming platforms where the movie is available.')
+table.add_row('rating_average', 'A quantitative assessment of the overall quality of a movie.')
+table.add_row('vote_count', 'The total number of people who voted for the movie.')
+table.add_row('author', 'Unique identifier for the user.')
+table.add_row('user_rating', 'Rating given by user.')
+console.print(table)
 ```
 
 ### Missing Data
 
-![](images/clipboard-1834072139.png){width="307" height="424"}
+```{python}
+import warnings 
+warnings.simplefilter(action ='ignore', category = FutureWarning)
 
-The dataset `movie_content_df` is missing some observations in `genre_ids`, `cast_names`, and `watch_providers`.
+#plotting missing values for movie_content_df
+  plt.figure(figsize = (18,8))
+  sns.heatmap(movie_content_df.isnull(), cmap = "Purples")
+  plt.xlabel('Variables')
+  plt.ylabel('Column Number')
+  plt.xticks(rotation = 80)
+  plt.title('Missing Values for movie_content_df')
+  plt.subplots_adjust(bottom = 0.25)
+  plt.show()
+```
 
-![](images/clipboard-3610589772.png){width="323"}
+The dataset `movie_content_df` is missing some observations in `genre_ids`, `cast_names`, and `watch_providers`. It appears that movies missing watch provider information are those that have been newly released. 
 
-While in the `movie_reviews_df`, it is missing a majority of `user_rating`.
+```{python}
+#plotting missing values for movie_reviews_df
+plt.figure(figsize = (18,8))
+sns.heatmap(movie_reviews_df.isnull(), cmap = "Purples")
+plt.xlabel('Variables')
+plt.ylabel('Column Number')
+plt.title('Missing Values for movie_reviews_df')
+plt.subplots_adjust(bottom = 0.25)
+plt.show()
+```
+
+
+While in the `movie_reviews_df`, it is missing a majority of `user_rating`. It could be that users either did not watch the movie or chose to skip rating it.
 
 #### Popular Genres
 
-![](images/clipboard-1866196344.png){width="394"}
+```{python}
+#separating genres and exploding
+movie_content_df['genre_ids'] = movie_content_df['genre_ids'].fillna('').astype(str)
+movie_content_df['genre_list'] = movie_content_df['genre_ids'].apply(lambda x: [genre.strip() for genre in x.split(',')])
+movies_exploded = movie_content_df.explode('genre_list')
 
-About 1600 of movies mention Drama in their genre list. Comedy and Thriller are the next popular genres with approximately 1400 and 1000 counts.
+#bar chart for genre counts
+genre_counts = movies_exploded['genre_list'].value_counts()
+plt.figure(figsize = (12, 6))
+sns.barplot(x = genre_counts.index[:10], y = genre_counts.values[:10], palette = "coolwarm")
+plt.xticks(rotation = 45)
+plt.xlabel('Genre')
+plt.ylabel('Count')
+plt.title('Popular Genres')
+plt.subplots_adjust(bottom = .25)
+plt.show()
+```
+
+About 1600 of movies are categorized under Drama, making it the most popular genre. Comedy and Thriller follow closely behind with approximately 1400 and 1000 counts. This suggests that these genres dominate the dataset, potentially representing popular trends in the movie industry. 
 
 #### Popular Movie Languages
 
-![](images/clipboard-1260077373.png){width="394"}
+```{python}
+#countplot for languages
+plt.figure(figsize = (12, 6))
+sns.countplot(y = 'original_language', data = movie_content_df, order = movie_content_df['original_language'].value_counts(ascending = False).index[:5])
+plt.xlabel('Count')
+plt.ylabel('Language')
+plt.title('Top 5 Movie Languages')
+plt.subplots_adjust(left = .25)
+plt.show()
+```
 
-We can see most of the languages in our dataset have the original language in English with a count of approximately 2,800. The following most popular languages are French and Japanese with a count of approximately 500 and 100.
+We can see that the majority of the movies in our dataset have their original language in English, with a count of approximately 2,800. This is expected as English is the dominant language in the film industry. The next popular languages are French and Japanese, with approximately 500 and 100 counts. France is considered as the origin of film and the Cannes Film Festival is French-based, while Japanese films are distinct in style which set apart from other films.
 
 #### Popular Actors
 
-![](images/clipboard-1337669541.png){width="397"}
+```{python}
+#separating actors and exploding
+movie_content_df['actors_list'] = movie_content_df['cast_names'].str.split(',')
+movies_exploded = movie_content_df.explode('actors_list')
 
-As we can see "Jr." is the most common actor in our movie dataset with a count of approximately 85. We do not know who exactly "Jr." is, but we believe the name was cut when retrieving the data. Other actors such as Samuel L. Jackson, and Bruce Willis were also common with a count of approximately 45 and 42.
+#bar chart for actor counts
+actors_count = movies_exploded['actors_list'].value_counts().sort_values(ascending = False)
+plt.figure(figsize = (12, 6))
+sns.barplot(x = actors_count.values[:15], y = actors_count.index[:15], orient = 'h', color = "skyblue")
+plt.xlabel('Count')
+plt.ylabel('Actor')
+plt.title('Common Actors')
+plt.yticks(rotation = 0)
+plt.subplots_adjust(left = .3)
+plt.show()
+```
+
+As we can see "Jr." is the most common actor in our movie dataset with a count of approximately 85. We do not know who exactly "Jr." is, but we believe the name was cut when retrieving the data. Other actors such as Samuel L. Jackson, and Bruce Willis were also common with counts of approximately 45 and 42.
 
 #### Providers
 
-![](images/clipboard-3952843974.png){width="394"}
+```{python}
+movie_content_df['providers_list'] = movie_content_df['watch_providers'].str.split(',')
+movies_exploded = movie_content_df.explode('providers_list')
 
-Our top providers are 'Apple TV', 'Google Play Movies', and 'Amazon Video'. They offer most of our movies in the dataset, offering approximately 3,000 movies.
+# Count the occurrences of each provider
+provider_counts = movies_exploded['providers_list'].value_counts()
+
+# Bar chart for the top providers
+plt.figure(figsize=(12,6))
+sns.barplot(x=provider_counts.values[:15], y=provider_counts.index[:15], color="pink")
+plt.xlabel('Number of Movies Available')
+plt.ylabel('Provider')
+plt.title('Most Available Streaming Providers')
+plt.subplots_adjust(left=0.4)
+plt.show()
+```
+
+Our top providers, 'Apple TV', 'Google Play Movies', dominate the dataset, offering approximately 3,000 movies. This reflects their strong presence in the streaming market. While these providers account for a significant portion of the dataset, YouTube and Microsoft Store offer approximately 2,500+ movies, highlighting the growing presence of digital platforms.
 
 #### Reviewers
 
-![](images/clipboard-577182410.png){width="394"}
+```{python}
+#counting how many times an author reviewed movies
+user_review_counts = movie_reviews_df['author'].value_counts()
 
-'CinemaSerf' is our top reviewer, reviewing approximately 300 movies. Following the author, 'r96sk' and 'Manuel São Bento' are the next top reviewers with approximately 170 and 110 movie reviews.
+# Bar chart for top reviewers
+plt.figure(figsize=(12,6))
+sns.barplot(x=user_review_counts.values[:10], y=user_review_counts.index[:10], color="darkviolet")
+plt.xlabel('Number of Reviews')
+plt.ylabel('Author')
+plt.title('Top 10 Users with Most Reviews')
+plt.subplots_adjust(left=0.4)
+plt.show()
+```
+
+'CinemaSerf' is our top reviewer, contributing reviews for approximately 300 movies. Following closely behind are 'r96sk' and 'Manuel São Bento' with approximately 170 and 110 movie reviews. It would be interesting to explore if their reviews are concentrated in particular genres or if they are more diverse.
+
 
 ## Modeling Approach
 
