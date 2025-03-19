@@ -268,7 +268,7 @@ def content_preprocessing(dataframe):
       return dataframe
     
 # Apply the preprocessing function
-movie_content_df = preprocessing(movie_content_df)
+movie_content_df = content_preprocessing(movie_content_df)
 ```
 
 The code chunk above applies the genre dictionary to extract genre categories. It also retains relevant columns in the DataFrame.
