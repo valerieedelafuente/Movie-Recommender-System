@@ -36,7 +36,7 @@ The `movie_content_df` has 4,000 rows representing an observation for each of th
 
 ### API Data Retrieval
 
-To use the TMDb API, users must create an account on [The Movie Database website](https://www.themoviedb.org/) and generate a personal authentication key. This key is required to authenticate API requests and obtain data. Content-based filtering and collborative-based filtering have their own respective data retrieval scripts. Both retrieval scripts include a delay between requests to avoid hitting TMDb's rate limit.
+To use the TMDb API, users must create an account on [The Movie Database website](https://www.themoviedb.org/) and generate a personal authentication key. This key is required to authenticate API requests and obtain data. Content-based filtering and collaborative-based filtering have their own respective data retrieval scripts. Both retrieval scripts include a delay between requests to avoid hitting TMDb's rate limit.
 
 #### Content-based filtering
 
@@ -468,7 +468,7 @@ warnings.simplefilter(action ='ignore', category = FutureWarning)
   plt.show()
 ```
 
-The dataset `movie_content_df` is missing some observations in `genre_ids`, `cast_names`, and `watch_providers`. It appears that movies missing watch provider information are those that have been newly released. 
+The dataset `movie_content_df` is missing some observations in `genre_ids`, `cast_names`, and `watch_providers`. It appears that movies missing watch provider information are those that have been newly released.
 
 ```{python}
 #plotting missing values for movie_reviews_df
@@ -480,7 +480,6 @@ plt.title('Missing Values for movie_reviews_df')
 plt.subplots_adjust(bottom = 0.25)
 plt.show()
 ```
-
 
 While in the `movie_reviews_df`, it is missing a majority of `user_rating`. It could be that users either did not watch the movie or chose to skip rating it.
 
@@ -504,7 +503,7 @@ plt.subplots_adjust(bottom = .25)
 plt.show()
 ```
 
-About 1600 of movies are categorized under Drama, making it the most popular genre. Comedy and Thriller follow closely behind with approximately 1400 and 1000 counts. This suggests that these genres dominate the dataset, potentially representing popular trends in the movie industry. 
+About 1600 of movies are categorized under Drama, making it the most popular genre. Comedy and Thriller follow closely behind with approximately 1400 and 1000 counts. This suggests that these genres dominate the dataset, potentially representing popular trends in the movie industry.
 
 #### Popular Movie Languages
 
@@ -580,7 +579,6 @@ plt.show()
 ```
 
 'CinemaSerf' is our top reviewer, contributing reviews for approximately 300 movies. Following closely behind are 'r96sk' and 'Manuel São Bento' with approximately 170 and 110 movie reviews. It would be interesting to explore if their reviews are concentrated in particular genres or if they are more diverse.
-
 
 ## Modeling Approach
 
