@@ -298,133 +298,95 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>After extracting all of the data from the online database, there are some preprocessing steps to be done so that the data is clean and in the correct format to move forward with the recommender system implementation. Each DataFrame has their own script for the tidying that is necessary.</p>
 <section id="content-based-filtering-1" class="level3">
 <h3 class="anchored" data-anchor-id="content-based-filtering-1">Content-based filtering</h3>
-<div class="cell" data-cache="true" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Creates the dictionary of genre IDs and names</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Load necessary packages</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>api_key <span class="op">=</span> <span class="st">"d3e8d7fcb94be031986259192b4fdfb0"</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Base URL</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">"https://api.themoviedb.org/3/genre/movie/list"</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Set parameters like the page number and API key</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>parameters <span class="op">=</span> {</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"api_key"</span>: api_key,</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"page"</span>:<span class="dv">1</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Make the GET request to fetch the data</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> requests.get(url, params<span class="op">=</span>parameters)</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if the request was successful</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> response.status_code <span class="op">==</span> <span class="dv">200</span>:</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    genre_data <span class="op">=</span> response.json()  <span class="co"># Convert response to JSON</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    genres <span class="op">=</span> genre_data[<span class="st">"genres"</span>]  <span class="co"># Extract the list of genres</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    genre_dict <span class="op">=</span> {genre[<span class="st">"id"</span>]: genre[<span class="st">"name"</span>] <span class="cf">for</span> genre <span class="kw">in</span> genres}  <span class="co"># Create dictionary</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(genre_dict)  <span class="co"># Print the genre mapping</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Error"</span>, response.status_code)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>{28: 'Action', 12: 'Adventure', 16: 'Animation', 35: 'Comedy', 80: 'Crime', 99: 'Documentary', 18: 'Drama', 10751: 'Family', 14: 'Fantasy', 36: 'History', 27: 'Horror', 10402: 'Music', 9648: 'Mystery', 10749: 'Romance', 878: 'Science Fiction', 10770: 'TV Movie', 53: 'Thriller', 10752: 'War', 37: 'Western'}</code></pre>
-</div>
-</div>
 <p>The first step in preprocessing the content-based data is to create a dictionary that maps the genre identification numbers to its corresponding genre category.</p>
-<div class="cell" data-cache="true" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load necessary packages</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ast</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> genre_preprocessing(dataframe):</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert genre_ids to lists</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    dataframe[<span class="st">'genre_ids'</span>] <span class="op">=</span> dataframe[<span class="st">'genre_ids'</span>].<span class="bu">apply</span>(ast.literal_eval)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Map genre_ids to genre names</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    dataframe[<span class="st">'genre_ids'</span>] <span class="op">=</span> dataframe[<span class="st">'genre_ids'</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> x: [genre_dict[genre_id] <span class="cf">for</span> genre_id <span class="kw">in</span> x])</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dataframe</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> content_preprocessing(dataframe):</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Format genre_ids</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>      dataframe <span class="op">=</span> genre_preprocessing(dataframe)</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Select necessary columns</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>      dataframe <span class="op">=</span> dataframe[[<span class="st">'movie_id'</span>, <span class="st">'title'</span>, <span class="st">'release_date'</span>, <span class="st">'genre_ids'</span>, <span class="st">'original_language'</span>, <span class="st">'cast_names'</span>, <span class="st">'watch_providers'</span>, <span class="st">'rating_average'</span>, <span class="st">'vote_count'</span>]]</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> dataframe</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the preprocessing function</span></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>movie_content_df <span class="op">=</span> content_preprocessing(movie_content_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-cache="true" data-results="hide" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load necessary packages</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ast</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> genre_preprocessing(dataframe):</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert genre_ids to lists</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    dataframe[<span class="st">'genre_ids'</span>] <span class="op">=</span> dataframe[<span class="st">'genre_ids'</span>].<span class="bu">apply</span>(ast.literal_eval)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Map genre_ids to genre names</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    dataframe[<span class="st">'genre_ids'</span>] <span class="op">=</span> dataframe[<span class="st">'genre_ids'</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> x: [genre_dict[genre_id] <span class="cf">for</span> genre_id <span class="kw">in</span> x])</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dataframe</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> content_preprocessing(dataframe):</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Format genre_ids</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>      dataframe <span class="op">=</span> genre_preprocessing(dataframe)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Select necessary columns</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>      dataframe <span class="op">=</span> dataframe[[<span class="st">'movie_id'</span>, <span class="st">'title'</span>, <span class="st">'release_date'</span>, <span class="st">'genre_ids'</span>, <span class="st">'original_language'</span>, <span class="st">'cast_names'</span>, <span class="st">'watch_providers'</span>, <span class="st">'rating_average'</span>, <span class="st">'vote_count'</span>]]</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> dataframe</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the preprocessing function</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>movie_content_df <span class="op">=</span> content_preprocessing(movie_content_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The code chunk above applies the genre dictionary to extract genre categories. It also retains relevant columns in the DataFrame.</p>
-<div class="cell" data-cache="true" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load necessary packages</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pycountry <span class="co"># for languages convertion</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>movie_content_df.columns</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Tidying `genre_ids` </span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> clean_genre_ids(value):</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(value, <span class="bu">list</span>):  <span class="co"># If it's already a list, clean and join</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">', '</span>.join(genre.strip() <span class="cf">for</span> genre <span class="kw">in</span> value)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> <span class="bu">isinstance</span>(value, <span class="bu">str</span>) <span class="kw">and</span> value.startswith(<span class="st">'c('</span>) <span class="kw">and</span> value.endswith(<span class="st">')'</span>):</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Handle string cases formatted like R's "c(...)"</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        genres <span class="op">=</span> [genre.strip().strip(<span class="st">'"'</span>) <span class="cf">for</span> genre <span class="kw">in</span> value[<span class="dv">2</span>:<span class="op">-</span><span class="dv">1</span>].split(<span class="st">','</span>)]</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">', '</span>.join(genres)</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> value  <span class="co"># Return as is if neither case</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Apply the function to genre_ids column</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">'genre_ids'</span>] <span class="op">=</span> movie_content_df[<span class="st">'genre_ids'</span>].<span class="bu">apply</span>(clean_genre_ids)</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check genre_ids missing and type</span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">'genre_ids'</span>].isna().<span class="bu">sum</span>() <span class="co"># No missing data</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">'genre_ids'</span>].<span class="bu">apply</span>(<span class="bu">type</span>).value_counts() <span class="co"># All are string type</span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Tidying original language to be full word</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> convert_language_code(code):</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>        language <span class="op">=</span> pycountry.languages.get(alpha_2<span class="op">=</span>code)</span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> language.name</span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span>:</span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> code  <span class="co"># no corresponding language, return original language code</span></span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">'original_language'</span>] <span class="op">=</span> movie_content_df[<span class="st">'original_language'</span>].<span class="bu">apply</span>(convert_language_code)</span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">"original_language"</span>] <span class="op">=</span> movie_content_df[<span class="st">"original_language"</span>].replace(<span class="st">"cn"</span>, <span class="st">"Chinese"</span>) <span class="co"># cn to Chinese</span></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">"original_language"</span>] <span class="op">=</span> movie_content_df[<span class="st">"original_language"</span>].replace(<span class="st">"xx"</span>, <span class="st">"Unknown"</span>) <span class="co"># xx to Unknown</span></span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Editing data types</span></span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">'rating_average'</span>] <span class="op">=</span> pd.to_numeric(movie_content_df[<span class="st">'rating_average'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>)</span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">'rating_average'</span>] <span class="op">=</span> movie_content_df[<span class="st">'rating_average'</span>].<span class="bu">round</span>(<span class="dv">0</span>).astype(<span class="bu">int</span>) <span class="co"># vote_average to round</span></span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">'vote_count'</span>] <span class="op">=</span> pd.to_numeric(movie_content_df[<span class="st">'vote_count'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>)</span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating a `release_year` column</span></span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>movie_content_df <span class="op">=</span> movie_content_df.copy()  <span class="co"># Ensure movies_df is a separate DataFrame</span></span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">"release_date"</span>] <span class="op">=</span> movie_content_df[<span class="st">"release_date"</span>].astype(<span class="bu">str</span>)</span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>movie_content_df <span class="op">=</span> movie_content_df[movie_content_df[<span class="st">"release_date"</span>] <span class="op">!=</span> <span class="st">''</span>]</span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">"release_year"</span>] <span class="op">=</span> pd.to_numeric(movie_content_df[<span class="st">"release_date"</span>].<span class="bu">str</span>[:<span class="dv">4</span>], errors <span class="op">=</span> <span class="st">"coerce"</span>)</span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>movie_content_df <span class="op">=</span> movie_content_df.drop(columns<span class="op">=</span>[<span class="st">"release_date"</span>])</span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="co"># Changing the `title` type</span></span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Convert to pandas' new string type</span></span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">"title"</span>] <span class="op">=</span> movie_content_df[<span class="st">"title"</span>].astype(<span class="st">"string"</span>)</span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Check the dtype again</span></span>
-<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(movie_content_df[<span class="st">"title"</span>].dtype)</span>
-<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a><span class="co"># Editing `cast_names`</span></span>
-<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">"cast_names"</span>] <span class="op">=</span> movie_content_df[<span class="st">"cast_names"</span>].replace(<span class="st">""</span>, pd.NA)</span>
-<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a><span class="co"># Editing `watch_providers`</span></span>
-<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">"watch_providers"</span>] <span class="op">=</span> movie_content_df[<span class="st">"watch_providers"</span>].replace(<span class="st">""</span>, pd.NA)</span>
-<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a><span class="co"># Reordering column names</span></span>
-<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Define the new column order</span></span>
-<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>new_column_order <span class="op">=</span> [<span class="st">'movie_id'</span>, <span class="st">'title'</span>, <span class="st">'release_year'</span>, <span class="st">'genre_ids'</span>, <span class="st">'original_language'</span>, <span class="st">'cast_names'</span>, <span class="st">'watch_providers'</span>, <span class="st">'rating_average'</span>, <span class="st">'vote_count'</span>]</span>
-<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Reorganize columns in the DataFrame</span></span>
-<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>movie_content_df <span class="op">=</span> movie_content_df[new_column_order]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>string</code></pre>
-</div>
+<div class="cell" data-cache="true" data-results="hide" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load necessary packages print</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pycountry <span class="co"># for languages convertion</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>movie_content_df.columns</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Tidying `genre_ids` </span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> clean_genre_ids(value):</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(value, <span class="bu">list</span>):  <span class="co"># If it's already a list, clean and join</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">', '</span>.join(genre.strip() <span class="cf">for</span> genre <span class="kw">in</span> value)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> <span class="bu">isinstance</span>(value, <span class="bu">str</span>) <span class="kw">and</span> value.startswith(<span class="st">'c('</span>) <span class="kw">and</span> value.endswith(<span class="st">')'</span>):</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Handle string cases formatted like R's "c(...)"</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        genres <span class="op">=</span> [genre.strip().strip(<span class="st">'"'</span>) <span class="cf">for</span> genre <span class="kw">in</span> value[<span class="dv">2</span>:<span class="op">-</span><span class="dv">1</span>].split(<span class="st">','</span>)]</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">', '</span>.join(genres)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> value  <span class="co"># Return as is if neither case</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Apply the function to genre_ids column</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">'genre_ids'</span>] <span class="op">=</span> movie_content_df[<span class="st">'genre_ids'</span>].<span class="bu">apply</span>(clean_genre_ids)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check genre_ids missing and type</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">'genre_ids'</span>].isna().<span class="bu">sum</span>() <span class="co"># No missing data</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">'genre_ids'</span>].<span class="bu">apply</span>(<span class="bu">type</span>).value_counts() <span class="co"># All are string type</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Tidying original language to be full word</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> convert_language_code(code):</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>        language <span class="op">=</span> pycountry.languages.get(alpha_2<span class="op">=</span>code)</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> language.name</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span>:</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> code  <span class="co"># no corresponding language, return original language code</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">'original_language'</span>] <span class="op">=</span> movie_content_df[<span class="st">'original_language'</span>].<span class="bu">apply</span>(convert_language_code)</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">"original_language"</span>] <span class="op">=</span> movie_content_df[<span class="st">"original_language"</span>].replace(<span class="st">"cn"</span>, <span class="st">"Chinese"</span>) <span class="co"># cn to Chinese</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">"original_language"</span>] <span class="op">=</span> movie_content_df[<span class="st">"original_language"</span>].replace(<span class="st">"xx"</span>, <span class="st">"Unknown"</span>) <span class="co"># xx to Unknown</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Editing data types</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">'rating_average'</span>] <span class="op">=</span> pd.to_numeric(movie_content_df[<span class="st">'rating_average'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>)</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">'rating_average'</span>] <span class="op">=</span> movie_content_df[<span class="st">'rating_average'</span>].<span class="bu">round</span>(<span class="dv">0</span>).astype(<span class="bu">int</span>) <span class="co"># vote_average to round</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">'vote_count'</span>] <span class="op">=</span> pd.to_numeric(movie_content_df[<span class="st">'vote_count'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>)</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating a `release_year` column</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>movie_content_df <span class="op">=</span> movie_content_df.copy()  <span class="co"># Ensure movies_df is a separate DataFrame</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">"release_date"</span>] <span class="op">=</span> movie_content_df[<span class="st">"release_date"</span>].astype(<span class="bu">str</span>)</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>movie_content_df <span class="op">=</span> movie_content_df[movie_content_df[<span class="st">"release_date"</span>] <span class="op">!=</span> <span class="st">''</span>]</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">"release_year"</span>] <span class="op">=</span> pd.to_numeric(movie_content_df[<span class="st">"release_date"</span>].<span class="bu">str</span>[:<span class="dv">4</span>], errors <span class="op">=</span> <span class="st">"coerce"</span>)</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>movie_content_df <span class="op">=</span> movie_content_df.drop(columns<span class="op">=</span>[<span class="st">"release_date"</span>])</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="co"># Changing the `title` type</span></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Convert to pandas' new string type</span></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">"title"</span>] <span class="op">=</span> movie_content_df[<span class="st">"title"</span>].astype(<span class="st">"string"</span>)</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a><span class="co"># Editing `cast_names`</span></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">"cast_names"</span>] <span class="op">=</span> movie_content_df[<span class="st">"cast_names"</span>].replace(<span class="st">""</span>, pd.NA)</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="co"># Editing `watch_providers`</span></span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">"watch_providers"</span>] <span class="op">=</span> movie_content_df[<span class="st">"watch_providers"</span>].replace(<span class="st">""</span>, pd.NA)</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="co"># Reordering column names</span></span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Define the new column order</span></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>new_column_order <span class="op">=</span> [<span class="st">'movie_id'</span>, <span class="st">'title'</span>, <span class="st">'release_year'</span>, <span class="st">'genre_ids'</span>, <span class="st">'original_language'</span>, <span class="st">'cast_names'</span>, <span class="st">'watch_providers'</span>, <span class="st">'rating_average'</span>, <span class="st">'vote_count'</span>]</span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Reorganize columns in the DataFrame</span></span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>movie_content_df <span class="op">=</span> movie_content_df[new_column_order]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The following edits were made in the code chunk above:</p>
 <ul>
@@ -440,60 +402,60 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="collaborative-based-filtering-1" class="level3">
 <h3 class="anchored" data-anchor-id="collaborative-based-filtering-1">Collaborative-based filtering</h3>
 <div class="cell" data-cache="true" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ast</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> genre_preprocessing(dataframe):</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert genre_ids to lists</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    dataframe[<span class="st">'genre_ids'</span>] <span class="op">=</span> dataframe[<span class="st">'genre_ids'</span>].<span class="bu">apply</span>(ast.literal_eval)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Map genre_ids to genre names</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    dataframe[<span class="st">'genre_ids'</span>] <span class="op">=</span> dataframe[<span class="st">'genre_ids'</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> x: [genre_dict[genre_id] <span class="cf">for</span> genre_id <span class="kw">in</span> x])</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dataframe</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> collab_preproccesing(dataframe):</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Format genre_ids</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>      dataframe <span class="op">=</span> genre_preprocessing(dataframe)</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Select necessary columns</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>      dataframe <span class="op">=</span> dataframe[[<span class="st">'id'</span>, <span class="st">'title'</span>, <span class="st">'release_date'</span>, <span class="st">'genre_ids'</span>, <span class="st">'original_language'</span>, <span class="st">'vote_count'</span>]]</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> dataframe</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the preprocessing function</span></span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>movies_df <span class="op">=</span> collab_preproccesing(movies_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ast</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> genre_preprocessing(dataframe):</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert genre_ids to lists</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    dataframe[<span class="st">'genre_ids'</span>] <span class="op">=</span> dataframe[<span class="st">'genre_ids'</span>].<span class="bu">apply</span>(ast.literal_eval)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Map genre_ids to genre names</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    dataframe[<span class="st">'genre_ids'</span>] <span class="op">=</span> dataframe[<span class="st">'genre_ids'</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> x: [genre_dict[genre_id] <span class="cf">for</span> genre_id <span class="kw">in</span> x])</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dataframe</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> collab_preproccesing(dataframe):</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Format genre_ids</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>      dataframe <span class="op">=</span> genre_preprocessing(dataframe)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Select necessary columns</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>      dataframe <span class="op">=</span> dataframe[[<span class="st">'id'</span>, <span class="st">'title'</span>, <span class="st">'release_date'</span>, <span class="st">'genre_ids'</span>, <span class="st">'original_language'</span>, <span class="st">'vote_count'</span>]]</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> dataframe</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the preprocessing function</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>movies_df <span class="op">=</span> collab_preproccesing(movies_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>To begin for the collaborative based preprocessing, a similar pipeline to what was used for content based is followed. The genre ids are mapped to genres names and the relevant columns are retained.</p>
 <div class="cell" data-cache="true" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating a `user_id` column</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>user_id_map <span class="op">=</span> {}  <span class="co"># Dictionary to store author -&gt; user_id mapping</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>current_id <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure 'user_id' column exists</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>movie_reviews_df[<span class="st">"user_id"</span>] <span class="op">=</span> pd.NA  </span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Get valid indices</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>valid_indices <span class="op">=</span> movie_reviews_df[<span class="st">"user_rating"</span>].notna() <span class="op">&amp;</span> (movie_reviews_df[<span class="st">"user_rating"</span>] <span class="op">!=</span> <span class="st">""</span>)</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Store user IDs in a list to avoid modifying DataFrame during iteration</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>user_ids <span class="op">=</span> []</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> idx, author <span class="kw">in</span> movie_reviews_df.loc[valid_indices, <span class="st">"author"</span>].items():</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> author <span class="kw">not</span> <span class="kw">in</span> user_id_map:</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>        user_id_map[author] <span class="op">=</span> current_id</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>        current_id <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    user_ids.append((idx, user_id_map[author]))</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Assign user IDs to the DataFrame</span></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> idx, user_id <span class="kw">in</span> user_ids:</span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    movie_reviews_df.loc[idx, <span class="st">"user_id"</span>] <span class="op">=</span> user_id</span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert `user_id` to integers (nullable type to allow NaN)</span></span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>movie_reviews_df[<span class="st">"user_id"</span>] <span class="op">=</span> movie_reviews_df[<span class="st">"user_id"</span>].astype(<span class="st">"Int64"</span>)</span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop the `author` column</span></span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>movie_reviews_df <span class="op">=</span> movie_reviews_df.drop(columns<span class="op">=</span>[<span class="st">"author"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating a `user_id` column</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>user_id_map <span class="op">=</span> {}  <span class="co"># Dictionary to store author -&gt; user_id mapping</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>current_id <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure 'user_id' column exists</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>movie_reviews_df[<span class="st">"user_id"</span>] <span class="op">=</span> pd.NA  </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Get valid indices</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>valid_indices <span class="op">=</span> movie_reviews_df[<span class="st">"user_rating"</span>].notna() <span class="op">&amp;</span> (movie_reviews_df[<span class="st">"user_rating"</span>] <span class="op">!=</span> <span class="st">""</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Store user IDs in a list to avoid modifying DataFrame during iteration</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>user_ids <span class="op">=</span> []</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> idx, author <span class="kw">in</span> movie_reviews_df.loc[valid_indices, <span class="st">"author"</span>].items():</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> author <span class="kw">not</span> <span class="kw">in</span> user_id_map:</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>        user_id_map[author] <span class="op">=</span> current_id</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>        current_id <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    user_ids.append((idx, user_id_map[author]))</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Assign user IDs to the DataFrame</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> idx, user_id <span class="kw">in</span> user_ids:</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    movie_reviews_df.loc[idx, <span class="st">"user_id"</span>] <span class="op">=</span> user_id</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert `user_id` to integers (nullable type to allow NaN)</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>movie_reviews_df[<span class="st">"user_id"</span>] <span class="op">=</span> movie_reviews_df[<span class="st">"user_id"</span>].astype(<span class="st">"Int64"</span>)</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop the `author` column</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>movie_reviews_df <span class="op">=</span> movie_reviews_df.drop(columns<span class="op">=</span>[<span class="st">"author"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The following edits were made in the code chunk above:</p>
 <ul>
@@ -507,202 +469,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>In this section, we are focusing on EDA to better understand the data. This is the stage where we are given insights into the structure and characteristics of the data, for instance missing values.</p>
 <section id="variables" class="level3">
 <h3 class="anchored" data-anchor-id="variables">Variables</h3>
-<div class="cell" data-cache="true" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rich.console <span class="im">import</span> Console</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rich.table <span class="im">import</span> Table</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>console <span class="op">=</span> Console()</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>table <span class="op">=</span> Table(title <span class="op">=</span> <span class="st">"Movie Dataset Variables"</span>, show_lines <span class="op">=</span> <span class="va">True</span>)</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>table.add_column(<span class="st">"Variable Name"</span>, style <span class="op">=</span> <span class="st">"cyan"</span>, justify <span class="op">=</span> <span class="st">"left"</span>)</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>table.add_column(<span class="st">"Description"</span>, style <span class="op">=</span> <span class="st">"magenta"</span>, justify <span class="op">=</span> <span class="st">"left"</span>)</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>table.add_row(<span class="st">'movie_id'</span>, <span class="st">'Unique identifier of the movie.'</span>)</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>table.add_row(<span class="st">'title'</span>, <span class="st">'Title of the movie.'</span>)</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>table.add_row(<span class="st">'release_year'</span>, <span class="st">'The year the movie was released.'</span>)</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>table.add_row(<span class="st">'genre_ids'</span>, <span class="st">'List of genres associated with a movie.'</span>)</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>table.add_row(<span class="st">'original_language'</span>, <span class="st">'Original language of the movie.'</span>)</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>table.add_row(<span class="st">'cast_names'</span>, <span class="st">'List of actors in the movie.'</span>)</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>table.add_row(<span class="st">'watch_providers'</span>, <span class="st">'Streaming platforms where the movie is available.'</span>)</span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>table.add_row(<span class="st">'rating_average'</span>, <span class="st">'A quantitative assessment of the overall quality of a movie.'</span>)</span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>table.add_row(<span class="st">'vote_count'</span>, <span class="st">'The total number of people who voted for the movie.'</span>)</span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>table.add_row(<span class="st">'author'</span>, <span class="st">'Unique identifier for the user.'</span>)</span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>table.add_row(<span class="st">'user_rating'</span>, <span class="st">'Rating given by user.'</span>)</span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>console.<span class="bu">print</span>(table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-style: italic">                              Movie Dataset Variables                               </span>
-┏━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style="font-weight: bold"> Variable Name     </span>┃<span style="font-weight: bold"> Description                                                  </span>┃
-┡━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080"> movie_id          </span>│<span style="color: #800080; text-decoration-color: #800080"> Unique identifier of the movie.                              </span>│
-├───────────────────┼──────────────────────────────────────────────────────────────┤
-│<span style="color: #008080; text-decoration-color: #008080"> title             </span>│<span style="color: #800080; text-decoration-color: #800080"> Title of the movie.                                          </span>│
-├───────────────────┼──────────────────────────────────────────────────────────────┤
-│<span style="color: #008080; text-decoration-color: #008080"> release_year      </span>│<span style="color: #800080; text-decoration-color: #800080"> The year the movie was released.                             </span>│
-├───────────────────┼──────────────────────────────────────────────────────────────┤
-│<span style="color: #008080; text-decoration-color: #008080"> genre_ids         </span>│<span style="color: #800080; text-decoration-color: #800080"> List of genres associated with a movie.                      </span>│
-├───────────────────┼──────────────────────────────────────────────────────────────┤
-│<span style="color: #008080; text-decoration-color: #008080"> original_language </span>│<span style="color: #800080; text-decoration-color: #800080"> Original language of the movie.                              </span>│
-├───────────────────┼──────────────────────────────────────────────────────────────┤
-│<span style="color: #008080; text-decoration-color: #008080"> cast_names        </span>│<span style="color: #800080; text-decoration-color: #800080"> List of actors in the movie.                                 </span>│
-├───────────────────┼──────────────────────────────────────────────────────────────┤
-│<span style="color: #008080; text-decoration-color: #008080"> watch_providers   </span>│<span style="color: #800080; text-decoration-color: #800080"> Streaming platforms where the movie is available.            </span>│
-├───────────────────┼──────────────────────────────────────────────────────────────┤
-│<span style="color: #008080; text-decoration-color: #008080"> rating_average    </span>│<span style="color: #800080; text-decoration-color: #800080"> A quantitative assessment of the overall quality of a movie. </span>│
-├───────────────────┼──────────────────────────────────────────────────────────────┤
-│<span style="color: #008080; text-decoration-color: #008080"> vote_count        </span>│<span style="color: #800080; text-decoration-color: #800080"> The total number of people who voted for the movie.          </span>│
-├───────────────────┼──────────────────────────────────────────────────────────────┤
-│<span style="color: #008080; text-decoration-color: #008080"> author            </span>│<span style="color: #800080; text-decoration-color: #800080"> Unique identifier for the user.                              </span>│
-├───────────────────┼──────────────────────────────────────────────────────────────┤
-│<span style="color: #008080; text-decoration-color: #008080"> user_rating       </span>│<span style="color: #800080; text-decoration-color: #800080"> Rating given by user.                                        </span>│
-└───────────────────┴──────────────────────────────────────────────────────────────┘
-</pre>
-</div>
-</div>
+<p><img src="images/Screen%20Shot%202025-03-19%20at%2012.51.43%20PM-01.png" class="img-fluid"></p>
 </section>
 <section id="missing-data" class="level3">
 <h3 class="anchored" data-anchor-id="missing-data">Missing Data</h3>
-<div class="cell" data-cache="true" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings </span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>warnings.simplefilter(action <span class="op">=</span><span class="st">'ignore'</span>, category <span class="op">=</span> <span class="pp">FutureWarning</span>)</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#plotting missing values for movie_content_df</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize <span class="op">=</span> (<span class="dv">18</span>,<span class="dv">8</span>))</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>sns.heatmap(movie_content_df.isnull(), cmap <span class="op">=</span> <span class="st">"Purples"</span>)</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Variables'</span>)</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Column Number'</span>)</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>plt.xticks(rotation <span class="op">=</span> <span class="dv">80</span>)</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Missing Values for movie_content_df'</span>)</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>plt.subplots_adjust(bottom <span class="op">=</span> <span class="fl">0.25</span>)</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="write-up_files/figure-html/cell-11-output-1.png" width="1274" height="669"></p>
-</div>
-</div>
+<p><img src="images/Screen%20Shot%202025-03-19%20at%2012.43.27%20PM.png" class="img-fluid"></p>
 <p>The dataset <code>movie_content_df</code> is missing some observations in <code>genre_ids</code>, <code>cast_names</code>, and <code>watch_providers</code>. It appears that movies missing watch provider information are those that have been newly released.</p>
-<div class="cell" data-cache="true" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">#plotting missing values for movie_reviews_df</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize <span class="op">=</span> (<span class="dv">18</span>,<span class="dv">8</span>))</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>sns.heatmap(movie_reviews_df.isnull(), cmap <span class="op">=</span> <span class="st">"Purples"</span>)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Variables'</span>)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Column Number'</span>)</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Missing Values for movie_reviews_df'</span>)</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>plt.subplots_adjust(bottom <span class="op">=</span> <span class="fl">0.25</span>)</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="write-up_files/figure-html/cell-12-output-1.png" width="1274" height="564"></p>
-</div>
-</div>
+<p><img src="images/Screen%20Shot%202025-03-19%20at%2012.43.07%20PM.png" class="img-fluid"></p>
 <p>While in the <code>movie_reviews_df</code>, it is missing a majority of <code>user_rating</code>. It could be that users either did not watch the movie or chose to skip rating it.</p>
 <section id="popular-genres" class="level4">
 <h4 class="anchored" data-anchor-id="popular-genres">Popular Genres</h4>
-<div class="cell" data-cache="true" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#separating genres and exploding</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">'genre_ids'</span>] <span class="op">=</span> movie_content_df[<span class="st">'genre_ids'</span>].fillna(<span class="st">''</span>).astype(<span class="bu">str</span>)</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">'genre_list'</span>] <span class="op">=</span> movie_content_df[<span class="st">'genre_ids'</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> x: [genre.strip() <span class="cf">for</span> genre <span class="kw">in</span> x.split(<span class="st">','</span>)])</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>movies_exploded <span class="op">=</span> movie_content_df.explode(<span class="st">'genre_list'</span>)</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">#bar chart for genre counts</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>genre_counts <span class="op">=</span> movies_exploded[<span class="st">'genre_list'</span>].value_counts()</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize <span class="op">=</span> (<span class="dv">12</span>, <span class="dv">6</span>))</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>sns.barplot(x <span class="op">=</span> genre_counts.index[:<span class="dv">10</span>], y <span class="op">=</span> genre_counts.values[:<span class="dv">10</span>], palette <span class="op">=</span> <span class="st">"coolwarm"</span>)</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>plt.xticks(rotation <span class="op">=</span> <span class="dv">45</span>)</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Genre'</span>)</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Count'</span>)</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Popular Genres'</span>)</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>plt.subplots_adjust(bottom <span class="op">=</span> <span class="fl">.25</span>)</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="write-up_files/figure-html/cell-13-output-1.png" width="974" height="509"></p>
-</div>
-</div>
-<p>About 1600 of movies are categorized under Drama, making it the most popular genre. Comedy and Thriller follow closely behind with approximately 1400 and 1000 counts. This suggests that these genres dominate the dataset, potentially representing popular trends in the movie industry.</p>
+<p><img src="images/Screen%20Shot%202025-03-19%20at%2012.34.50%20PM.png" class="img-fluid"></p>
+<p>About 1750 of movies are categorized under Drama, making it the most popular genre. Comedy and Thriller follow closely behind with approximately 1200 and 1000 counts. This suggests that these genres dominate the dataset, potentially representing popular trends in the movie industry.</p>
 </section>
 <section id="popular-movie-languages" class="level4">
 <h4 class="anchored" data-anchor-id="popular-movie-languages">Popular Movie Languages</h4>
-<div class="cell" data-cache="true" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">#countplot for languages</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize <span class="op">=</span> (<span class="dv">12</span>, <span class="dv">6</span>))</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>sns.countplot(y <span class="op">=</span> <span class="st">'original_language'</span>, data <span class="op">=</span> movie_content_df, order <span class="op">=</span> movie_content_df[<span class="st">'original_language'</span>].value_counts(ascending <span class="op">=</span> <span class="va">False</span>).index[:<span class="dv">5</span>])</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Count'</span>)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Language'</span>)</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Top 5 Movie Languages'</span>)</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>plt.subplots_adjust(left <span class="op">=</span> <span class="fl">.25</span>)</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="write-up_files/figure-html/cell-14-output-1.png" width="856" height="523"></p>
-</div>
-</div>
+<p><img src="images/Screen%20Shot%202025-03-19%20at%2012.35.40%20PM.png" class="img-fluid"></p>
 <p>We can see that the majority of the movies in our dataset have their original language in English, with a count of approximately 2,800. This is expected as English is the dominant language in the film industry. The next popular languages are French and Japanese, with approximately 500 and 100 counts. France is considered as the origin of film and the Cannes Film Festival is French-based, while Japanese films are distinct in style which set apart from other films.</p>
 </section>
 <section id="popular-actors" class="level4">
 <h4 class="anchored" data-anchor-id="popular-actors">Popular Actors</h4>
-<div class="cell" data-cache="true" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#separating actors and exploding</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">'actors_list'</span>] <span class="op">=</span> movie_content_df[<span class="st">'cast_names'</span>].<span class="bu">str</span>.split(<span class="st">','</span>)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>movies_exploded <span class="op">=</span> movie_content_df.explode(<span class="st">'actors_list'</span>)</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">#bar chart for actor counts</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>actors_count <span class="op">=</span> movies_exploded[<span class="st">'actors_list'</span>].value_counts().sort_values(ascending <span class="op">=</span> <span class="va">False</span>)</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize <span class="op">=</span> (<span class="dv">12</span>, <span class="dv">6</span>))</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>sns.barplot(x <span class="op">=</span> actors_count.values[:<span class="dv">15</span>], y <span class="op">=</span> actors_count.index[:<span class="dv">15</span>], orient <span class="op">=</span> <span class="st">'h'</span>, color <span class="op">=</span> <span class="st">"skyblue"</span>)</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Count'</span>)</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Actor'</span>)</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Common Actors'</span>)</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>plt.yticks(rotation <span class="op">=</span> <span class="dv">0</span>)</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>plt.subplots_adjust(left <span class="op">=</span> <span class="fl">.3</span>)</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="write-up_files/figure-html/cell-15-output-1.png" width="866" height="523"></p>
-</div>
-</div>
-<p>As we can see “Jr.” is the most common actor in our movie dataset with a count of approximately 85. We do not know who exactly “Jr.” is, but we believe the name was cut when retrieving the data. Other actors such as Samuel L. Jackson, and Bruce Willis were also common with counts of approximately 45 and 42.</p>
+<p><img src="images/Screen%20Shot%202025-03-19%20at%2012.36.07%20PM.png" class="img-fluid"></p>
+<p>As we can see “Jr.” is the most common actor in our movie dataset with a count of approximately 85. We do not know who exactly “Jr.” is, but we believe the name was cut when retrieving the data. Other actors such as Samuel L. Jackson, and Willem Dafoe were also common with counts of approximately 45 and 42.</p>
 </section>
 <section id="providers" class="level4">
 <h4 class="anchored" data-anchor-id="providers">Providers</h4>
-<div class="cell" data-cache="true" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">'providers_list'</span>] <span class="op">=</span> movie_content_df[<span class="st">'watch_providers'</span>].<span class="bu">str</span>.split(<span class="st">','</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>movies_exploded <span class="op">=</span> movie_content_df.explode(<span class="st">'providers_list'</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Count the occurrences of each provider</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>provider_counts <span class="op">=</span> movies_exploded[<span class="st">'providers_list'</span>].value_counts()</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Bar chart for the top providers</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>,<span class="dv">6</span>))</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>sns.barplot(x<span class="op">=</span>provider_counts.values[:<span class="dv">15</span>], y<span class="op">=</span>provider_counts.index[:<span class="dv">15</span>], color<span class="op">=</span><span class="st">"pink"</span>)</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Number of Movies Available'</span>)</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Provider'</span>)</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Most Available Streaming Providers'</span>)</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>plt.subplots_adjust(left<span class="op">=</span><span class="fl">0.4</span>)</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="write-up_files/figure-html/cell-16-output-1.png" width="765" height="523"></p>
-</div>
-</div>
+<p><img src="images/Screen%20Shot%202025-03-19%20at%2012.36.35%20PM.png" class="img-fluid"></p>
 <p>Our top providers, ‘Apple TV’, ‘Google Play Movies’, dominate the dataset, offering approximately 3,000 movies. This reflects their strong presence in the streaming market. While these providers account for a significant portion of the dataset, YouTube and Microsoft Store offer approximately 2,500+ movies, highlighting the growing presence of digital platforms.</p>
 </section>
 <section id="reviewers" class="level4">
 <h4 class="anchored" data-anchor-id="reviewers">Reviewers</h4>
-<div class="cell" data-cache="true" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#counting how many times an author reviewed movies</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>user_review_counts <span class="op">=</span> movie_reviews_df[<span class="st">'user_id'</span>].value_counts()</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Bar chart for top reviewers</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>,<span class="dv">6</span>))</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>sns.barplot(x<span class="op">=</span>user_review_counts.values[:<span class="dv">10</span>], y<span class="op">=</span>user_review_counts.index[:<span class="dv">10</span>], color<span class="op">=</span><span class="st">"darkviolet"</span>)</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Number of Reviews'</span>)</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Author'</span>)</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Top 10 Users with Most Reviews'</span>)</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>plt.subplots_adjust(left<span class="op">=</span><span class="fl">0.4</span>)</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="write-up_files/figure-html/cell-17-output-1.png" width="648" height="523"></p>
-</div>
-</div>
-<p>‘CinemaSerf’ is our top reviewer, contributing reviews for approximately 300 movies. Following closely behind are ‘r96sk’ and ‘Manuel São Bento’ with approximately 170 and 110 movie reviews. It would be interesting to explore if their reviews are concentrated in particular genres or if they are more diverse.</p>
+<p><img src="images/Screen%20Shot%202025-03-19%20at%2012.39.55%20PM.png" class="img-fluid"></p>
+<p>‘CinemaSerf’ is our top reviewer, contributing reviews for approximately 1200 movies. Following closely behind are ‘r96sk’ and ‘Gimly’ with approximately 600 and 400 movie reviews. It would be interesting to explore if their reviews are concentrated in particular genres or if they are more diverse.</p>
 </section>
 </section>
 </section>
@@ -718,25 +516,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Apply TF-IDF vectorization to convert text into numerical vectors</li>
 <li>Compute cosine similarity to measure the pairwise similarity between movies</li>
 </ul>
-<div class="cell" data-cache="true" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine relevent features</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">"combined_features"</span>] <span class="op">=</span> (</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    movie_content_df[<span class="st">"genre_ids"</span>].fillna(<span class="st">""</span>).<span class="bu">str</span>.replace(<span class="st">","</span>, <span class="st">" "</span>) <span class="op">+</span> <span class="st">" | "</span> <span class="op">+</span>  </span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    movie_content_df[<span class="st">"cast_names"</span>].fillna(<span class="st">""</span>).<span class="bu">str</span>.replace(<span class="st">","</span>, <span class="st">" "</span>) <span class="op">+</span> <span class="st">" | "</span> <span class="op">+</span>  </span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    movie_content_df[<span class="st">"watch_providers"</span>].fillna(<span class="st">""</span>).<span class="bu">str</span>.replace(<span class="st">","</span>, <span class="st">" "</span>)</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co"># TF-IDF Vectorization</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.feature_extraction.text <span class="im">import</span> TfidfVectorizer</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>tfidf_vectorizer <span class="op">=</span> TfidfVectorizer(stop_words<span class="op">=</span><span class="st">"english"</span>, min_df<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>tfidf_matrix <span class="op">=</span> tfidf_vectorizer.fit_transform(movie_content_df[<span class="st">"combined_features"</span>])</span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"TF-IDF Matrix Shape:"</span>, tfidf_matrix.shape)</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute Cosine Similarity</span></span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics.pairwise <span class="im">import</span> cosine_similarity</span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>cosine_sim <span class="op">=</span> cosine_similarity(tfidf_matrix, tfidf_matrix)</span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Cosine Similarity Matrix Shape:"</span>, cosine_sim.shape)</span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Sample Cosine Similarity Scores:</span><span class="ch">\n</span><span class="st">"</span>, cosine_sim[:<span class="dv">5</span>, :<span class="dv">5</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-cache="true" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine relevent features</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">"combined_features"</span>] <span class="op">=</span> (</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    movie_content_df[<span class="st">"genre_ids"</span>].fillna(<span class="st">""</span>).<span class="bu">str</span>.replace(<span class="st">","</span>, <span class="st">" "</span>) <span class="op">+</span> <span class="st">" | "</span> <span class="op">+</span>  </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    movie_content_df[<span class="st">"cast_names"</span>].fillna(<span class="st">""</span>).<span class="bu">str</span>.replace(<span class="st">","</span>, <span class="st">" "</span>) <span class="op">+</span> <span class="st">" | "</span> <span class="op">+</span>  </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    movie_content_df[<span class="st">"watch_providers"</span>].fillna(<span class="st">""</span>).<span class="bu">str</span>.replace(<span class="st">","</span>, <span class="st">" "</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># TF-IDF Vectorization</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.feature_extraction.text <span class="im">import</span> TfidfVectorizer</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>tfidf_vectorizer <span class="op">=</span> TfidfVectorizer(stop_words<span class="op">=</span><span class="st">"english"</span>, min_df<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>tfidf_matrix <span class="op">=</span> tfidf_vectorizer.fit_transform(movie_content_df[<span class="st">"combined_features"</span>])</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"TF-IDF Matrix Shape:"</span>, tfidf_matrix.shape)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute Cosine Similarity</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics.pairwise <span class="im">import</span> cosine_similarity</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>cosine_sim <span class="op">=</span> cosine_similarity(tfidf_matrix, tfidf_matrix)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Cosine Similarity Matrix Shape:"</span>, cosine_sim.shape)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Sample Cosine Similarity Scores:</span><span class="ch">\n</span><span class="st">"</span>, cosine_sim[:<span class="dv">5</span>, :<span class="dv">5</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>TF-IDF Matrix Shape: (4000, 25462)
 Cosine Similarity Matrix Shape: (4000, 4000)
@@ -754,35 +552,35 @@ Sample Cosine Similarity Scores:
 <li>Normalize numeric features and concatenate them with TF-IDF vectors</li>
 <li>Compute linear kernel similarity</li>
 </ul>
-<div class="cell" data-cache="true" data-execution_count="19">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.feature_extraction.text <span class="im">import</span> TfidfVectorizer</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> MinMaxScaler</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co"># TF-IDF</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">"combined_features"</span>] <span class="op">=</span> (</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    movie_content_df[<span class="st">"genre_ids"</span>].fillna(<span class="st">""</span>).<span class="bu">str</span>.replace(<span class="st">","</span>, <span class="st">" "</span>) <span class="op">+</span> <span class="st">" | "</span> <span class="op">+</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    movie_content_df[<span class="st">"cast_names"</span>].fillna(<span class="st">""</span>).<span class="bu">str</span>.replace(<span class="st">","</span>, <span class="st">" "</span>) <span class="op">+</span> <span class="st">" | "</span> <span class="op">+</span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    movie_content_df[<span class="st">"watch_providers"</span>].fillna(<span class="st">""</span>).<span class="bu">str</span>.replace(<span class="st">","</span>, <span class="st">" "</span>)</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>tfidf_vectorizer <span class="op">=</span> TfidfVectorizer(stop_words<span class="op">=</span><span class="st">"english"</span>, min_df<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>tfidf_matrix <span class="op">=</span> tfidf_vectorizer.fit_transform(movie_content_df[<span class="st">"combined_features"</span>])</span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="co"># add numeric features(need standardization)</span></span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>scaler <span class="op">=</span> MinMaxScaler()</span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>numeric_features <span class="op">=</span> movie_content_df[[<span class="st">"rating_average"</span>, <span class="st">"vote_count"</span>]].fillna(<span class="dv">0</span>)</span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>numeric_matrix <span class="op">=</span> scaler.fit_transform(numeric_features)</span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="co"># integrate TFIDF and numeric features</span></span>
-<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>final_matrix <span class="op">=</span> np.hstack((tfidf_matrix.toarray(), numeric_matrix))</span>
-<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Linear Kernel similarity</span></span>
-<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics.pairwise <span class="im">import</span> linear_kernel</span>
-<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>linear_sim <span class="op">=</span> linear_kernel(final_matrix, final_matrix)</span>
-<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Linear Kernel Similarity Matrix Shape:"</span>, linear_sim.shape)</span>
-<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Sample Linear Kernel Similarity Scores:</span><span class="ch">\n</span><span class="st">"</span>, linear_sim[:<span class="dv">5</span>, :<span class="dv">5</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-cache="true" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.feature_extraction.text <span class="im">import</span> TfidfVectorizer</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> MinMaxScaler</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># TF-IDF</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>movie_content_df[<span class="st">"combined_features"</span>] <span class="op">=</span> (</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    movie_content_df[<span class="st">"genre_ids"</span>].fillna(<span class="st">""</span>).<span class="bu">str</span>.replace(<span class="st">","</span>, <span class="st">" "</span>) <span class="op">+</span> <span class="st">" | "</span> <span class="op">+</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    movie_content_df[<span class="st">"cast_names"</span>].fillna(<span class="st">""</span>).<span class="bu">str</span>.replace(<span class="st">","</span>, <span class="st">" "</span>) <span class="op">+</span> <span class="st">" | "</span> <span class="op">+</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    movie_content_df[<span class="st">"watch_providers"</span>].fillna(<span class="st">""</span>).<span class="bu">str</span>.replace(<span class="st">","</span>, <span class="st">" "</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>tfidf_vectorizer <span class="op">=</span> TfidfVectorizer(stop_words<span class="op">=</span><span class="st">"english"</span>, min_df<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>tfidf_matrix <span class="op">=</span> tfidf_vectorizer.fit_transform(movie_content_df[<span class="st">"combined_features"</span>])</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co"># add numeric features(need standardization)</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>scaler <span class="op">=</span> MinMaxScaler()</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>numeric_features <span class="op">=</span> movie_content_df[[<span class="st">"rating_average"</span>, <span class="st">"vote_count"</span>]].fillna(<span class="dv">0</span>)</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>numeric_matrix <span class="op">=</span> scaler.fit_transform(numeric_features)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="co"># integrate TFIDF and numeric features</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>final_matrix <span class="op">=</span> np.hstack((tfidf_matrix.toarray(), numeric_matrix))</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Linear Kernel similarity</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics.pairwise <span class="im">import</span> linear_kernel</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>linear_sim <span class="op">=</span> linear_kernel(final_matrix, final_matrix)</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Linear Kernel Similarity Matrix Shape:"</span>, linear_sim.shape)</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Sample Linear Kernel Similarity Scores:</span><span class="ch">\n</span><span class="st">"</span>, linear_sim[:<span class="dv">5</span>, :<span class="dv">5</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear Kernel Similarity Matrix Shape: (4000, 4000)
 Sample Linear Kernel Similarity Scores:
@@ -802,52 +600,52 @@ Sample Linear Kernel Similarity Scores:
 <li><strong>Linear Kernel Similarity (text + numeric)</strong></li>
 </ul></li>
 </ul>
-<div class="cell" data-cache="true" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> difflib <span class="im">import</span> get_close_matches</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> content_based_movie_recs_print(movie_title, movie_content_df, cosine_sim, top_n<span class="op">=</span><span class="dv">11</span>):</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># prepprocess input: remove space and lowercase</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    clean_title <span class="op">=</span> movie_title.strip().lower()</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># preprocess movie title</span></span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    movie_content_df[<span class="st">"clean_title"</span>] <span class="op">=</span> movie_content_df[<span class="st">"title"</span>].<span class="bu">str</span>.strip().<span class="bu">str</span>.lower()</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># find the most similar movie</span></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    possible_matches <span class="op">=</span> get_close_matches(clean_title, movie_content_df[<span class="st">"clean_title"</span>], n<span class="op">=</span><span class="dv">1</span>, cutoff<span class="op">=</span><span class="fl">0.7</span>)</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> possible_matches:</span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>        clean_title <span class="op">=</span> possible_matches[<span class="dv">0</span>]</span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>    movie_idx <span class="op">=</span> movie_content_df[movie_content_df[<span class="st">"clean_title"</span>] <span class="op">==</span> clean_title].index</span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> movie_idx.empty:</span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ss">f"Movie '</span><span class="sc">{</span>movie_title<span class="sc">.</span>strip()<span class="sc">}</span><span class="ss">' not found. Please check the title."</span></span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>    movie_idx <span class="op">=</span> movie_idx[<span class="dv">0</span>]</span>
-<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>   </span>
-<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>    similarity_scores <span class="op">=</span> <span class="bu">list</span>(<span class="bu">enumerate</span>(cosine_sim[movie_idx]))</span>
-<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>    similarity_scores <span class="op">=</span> <span class="bu">sorted</span>(similarity_scores, key<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="dv">1</span>], reverse<span class="op">=</span><span class="va">True</span>)[<span class="dv">1</span>:top_n<span class="op">+</span><span class="dv">1</span>]</span>
-<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>   </span>
-<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a>    top_movies <span class="op">=</span> similarity_scores[<span class="dv">1</span>:top_n<span class="op">+</span><span class="dv">1</span>]</span>
-<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a>    recommendations <span class="op">=</span> movie_content_df.iloc[[i[<span class="dv">0</span>] <span class="cf">for</span> i <span class="kw">in</span> top_movies]][[<span class="st">"title"</span>, <span class="st">"genre_ids"</span>, <span class="st">"rating_average"</span>]]</span>
-<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">🎬 Using matched movie: </span><span class="sc">{</span>movie_content_df<span class="sc">.</span>iloc[movie_idx][<span class="st">'title'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">📌 Top 10 movies similar to '</span><span class="sc">{</span>movie_title<span class="sc">.</span>strip()<span class="sc">}</span><span class="ss">':"</span>)</span>
-<span id="cb22-38"><a href="#cb22-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, row <span class="kw">in</span> <span class="bu">enumerate</span>(recommendations.itertuples(), start<span class="op">=</span><span class="dv">1</span>):</span>
-<span id="cb22-39"><a href="#cb22-39" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">. </span><span class="sc">{</span>row<span class="sc">.</span>title<span class="sc">}</span><span class="ss"> (Genre: </span><span class="sc">{</span>row<span class="sc">.</span>genre_ids<span class="sc">}</span><span class="ss">, Rating: </span><span class="sc">{</span>row<span class="sc">.</span>rating_average<span class="sc">}</span><span class="ss">)"</span>)</span>
-<span id="cb22-40"><a href="#cb22-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-41"><a href="#cb22-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> recommendations</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-cache="true" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> difflib <span class="im">import</span> get_close_matches</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> content_based_movie_recs_print(movie_title, movie_content_df, cosine_sim, top_n<span class="op">=</span><span class="dv">11</span>):</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># prepprocess input: remove space and lowercase</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    clean_title <span class="op">=</span> movie_title.strip().lower()</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># preprocess movie title</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    movie_content_df[<span class="st">"clean_title"</span>] <span class="op">=</span> movie_content_df[<span class="st">"title"</span>].<span class="bu">str</span>.strip().<span class="bu">str</span>.lower()</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># find the most similar movie</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    possible_matches <span class="op">=</span> get_close_matches(clean_title, movie_content_df[<span class="st">"clean_title"</span>], n<span class="op">=</span><span class="dv">1</span>, cutoff<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> possible_matches:</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>        clean_title <span class="op">=</span> possible_matches[<span class="dv">0</span>]</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    movie_idx <span class="op">=</span> movie_content_df[movie_content_df[<span class="st">"clean_title"</span>] <span class="op">==</span> clean_title].index</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> movie_idx.empty:</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ss">f"Movie '</span><span class="sc">{</span>movie_title<span class="sc">.</span>strip()<span class="sc">}</span><span class="ss">' not found. Please check the title."</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    movie_idx <span class="op">=</span> movie_idx[<span class="dv">0</span>]</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>    similarity_scores <span class="op">=</span> <span class="bu">list</span>(<span class="bu">enumerate</span>(cosine_sim[movie_idx]))</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>    similarity_scores <span class="op">=</span> <span class="bu">sorted</span>(similarity_scores, key<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="dv">1</span>], reverse<span class="op">=</span><span class="va">True</span>)[<span class="dv">1</span>:top_n<span class="op">+</span><span class="dv">1</span>]</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>    top_movies <span class="op">=</span> similarity_scores[<span class="dv">1</span>:top_n<span class="op">+</span><span class="dv">1</span>]</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>    recommendations <span class="op">=</span> movie_content_df.iloc[[i[<span class="dv">0</span>] <span class="cf">for</span> i <span class="kw">in</span> top_movies]][[<span class="st">"title"</span>, <span class="st">"genre_ids"</span>, <span class="st">"rating_average"</span>]]</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">🎬 Using matched movie: </span><span class="sc">{</span>movie_content_df<span class="sc">.</span>iloc[movie_idx][<span class="st">'title'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">📌 Top 10 movies similar to '</span><span class="sc">{</span>movie_title<span class="sc">.</span>strip()<span class="sc">}</span><span class="ss">':"</span>)</span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, row <span class="kw">in</span> <span class="bu">enumerate</span>(recommendations.itertuples(), start<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">. </span><span class="sc">{</span>row<span class="sc">.</span>title<span class="sc">}</span><span class="ss"> (Genre: </span><span class="sc">{</span>row<span class="sc">.</span>genre_ids<span class="sc">}</span><span class="ss">, Rating: </span><span class="sc">{</span>row<span class="sc">.</span>rating_average<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> recommendations</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-cache="true" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>recommendations1 <span class="op">=</span> content_based_movie_recs_print(<span class="st">"The Gorgee"</span>, movie_content_df, cosine_sim)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>recommendations2 <span class="op">=</span> content_based_movie_recs_print(<span class="st">"Paprika"</span>, movie_content_df, cosine_sim)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-cache="true" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>recommendations1 <span class="op">=</span> content_based_movie_recs_print(<span class="st">"The Gorgee"</span>, movie_content_df, cosine_sim)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>recommendations2 <span class="op">=</span> content_based_movie_recs_print(<span class="st">"Paprika"</span>, movie_content_df, cosine_sim)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 🎬 Using matched movie: The Gorge
@@ -879,52 +677,52 @@ Sample Linear Kernel Similarity Scores:
 10. Evangelion: 2.0 You Can (Not) Advance (Genre: Animation, Science Fiction, Action, Drama, Rating: 8)</code></pre>
 </div>
 </div>
-<div class="cell" data-cache="true" data-execution_count="22">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> difflib <span class="im">import</span> get_close_matches</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> content_based_movie_recs_linear(movie_title, movie_content_df, linear_sim, top_n<span class="op">=</span><span class="dv">10</span>):</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># prepprocess input: remove space and lowercase</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    clean_title <span class="op">=</span> movie_title.strip().lower()</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># preprocess movie title</span></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    movie_content_df[<span class="st">"clean_title"</span>] <span class="op">=</span> movie_content_df[<span class="st">"title"</span>].<span class="bu">str</span>.strip().<span class="bu">str</span>.lower()</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># find the most similar movie</span></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>    possible_matches <span class="op">=</span> get_close_matches(clean_title, movie_content_df[<span class="st">"clean_title"</span>], n<span class="op">=</span><span class="dv">1</span>, cutoff<span class="op">=</span><span class="fl">0.7</span>)</span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> possible_matches:</span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>        clean_title <span class="op">=</span> possible_matches[<span class="dv">0</span>]</span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ss">f"Movie '</span><span class="sc">{</span>movie_title<span class="sc">.</span>strip()<span class="sc">}</span><span class="ss">' not found. Please check the title."</span></span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>    movie_idx <span class="op">=</span> movie_content_df[movie_content_df[<span class="st">"clean_title"</span>] <span class="op">==</span> clean_title].index</span>
-<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> movie_idx.empty:</span>
-<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ss">f"Movie '</span><span class="sc">{</span>movie_title<span class="sc">.</span>strip()<span class="sc">}</span><span class="ss">' not found. Please check the title."</span></span>
-<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>    movie_idx <span class="op">=</span> movie_idx[<span class="dv">0</span>]</span>
-<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>    similarity_scores <span class="op">=</span> <span class="bu">list</span>(<span class="bu">enumerate</span>(linear_sim[movie_idx]))</span>
-<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>    similarity_scores <span class="op">=</span> <span class="bu">sorted</span>(similarity_scores, key<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="dv">1</span>], reverse<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Top 10</span></span>
-<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>    top_movies <span class="op">=</span> similarity_scores[<span class="dv">1</span>:top_n<span class="op">+</span><span class="dv">1</span>]</span>
-<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>    recommendations <span class="op">=</span> movie_content_df.iloc[[i[<span class="dv">0</span>] <span class="cf">for</span> i <span class="kw">in</span> top_movies]][[<span class="st">"title"</span>, <span class="st">"genre_ids"</span>, <span class="st">"rating_average"</span>]]</span>
-<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">🎬 Using matched movie: </span><span class="sc">{</span>movie_content_df<span class="sc">.</span>iloc[movie_idx][<span class="st">'title'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">📌 Top 10 movies similar to '</span><span class="sc">{</span>movie_title<span class="sc">.</span>strip()<span class="sc">}</span><span class="ss">':"</span>)</span>
-<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, row <span class="kw">in</span> <span class="bu">enumerate</span>(recommendations.itertuples(), start<span class="op">=</span><span class="dv">1</span>):</span>
-<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">. </span><span class="sc">{</span>row<span class="sc">.</span>title<span class="sc">}</span><span class="ss"> (Genre: </span><span class="sc">{</span>row<span class="sc">.</span>genre_ids<span class="sc">}</span><span class="ss">, Rating: </span><span class="sc">{</span>row<span class="sc">.</span>rating_average<span class="sc">}</span><span class="ss">)"</span>)</span>
-<span id="cb25-40"><a href="#cb25-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-41"><a href="#cb25-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> recommendations</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-cache="true" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> difflib <span class="im">import</span> get_close_matches</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> content_based_movie_recs_linear(movie_title, movie_content_df, linear_sim, top_n<span class="op">=</span><span class="dv">10</span>):</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># prepprocess input: remove space and lowercase</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    clean_title <span class="op">=</span> movie_title.strip().lower()</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># preprocess movie title</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    movie_content_df[<span class="st">"clean_title"</span>] <span class="op">=</span> movie_content_df[<span class="st">"title"</span>].<span class="bu">str</span>.strip().<span class="bu">str</span>.lower()</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># find the most similar movie</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    possible_matches <span class="op">=</span> get_close_matches(clean_title, movie_content_df[<span class="st">"clean_title"</span>], n<span class="op">=</span><span class="dv">1</span>, cutoff<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> possible_matches:</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>        clean_title <span class="op">=</span> possible_matches[<span class="dv">0</span>]</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ss">f"Movie '</span><span class="sc">{</span>movie_title<span class="sc">.</span>strip()<span class="sc">}</span><span class="ss">' not found. Please check the title."</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>    movie_idx <span class="op">=</span> movie_content_df[movie_content_df[<span class="st">"clean_title"</span>] <span class="op">==</span> clean_title].index</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> movie_idx.empty:</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ss">f"Movie '</span><span class="sc">{</span>movie_title<span class="sc">.</span>strip()<span class="sc">}</span><span class="ss">' not found. Please check the title."</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    movie_idx <span class="op">=</span> movie_idx[<span class="dv">0</span>]</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>    similarity_scores <span class="op">=</span> <span class="bu">list</span>(<span class="bu">enumerate</span>(linear_sim[movie_idx]))</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>    similarity_scores <span class="op">=</span> <span class="bu">sorted</span>(similarity_scores, key<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="dv">1</span>], reverse<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Top 10</span></span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>    top_movies <span class="op">=</span> similarity_scores[<span class="dv">1</span>:top_n<span class="op">+</span><span class="dv">1</span>]</span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>    recommendations <span class="op">=</span> movie_content_df.iloc[[i[<span class="dv">0</span>] <span class="cf">for</span> i <span class="kw">in</span> top_movies]][[<span class="st">"title"</span>, <span class="st">"genre_ids"</span>, <span class="st">"rating_average"</span>]]</span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">🎬 Using matched movie: </span><span class="sc">{</span>movie_content_df<span class="sc">.</span>iloc[movie_idx][<span class="st">'title'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">📌 Top 10 movies similar to '</span><span class="sc">{</span>movie_title<span class="sc">.</span>strip()<span class="sc">}</span><span class="ss">':"</span>)</span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, row <span class="kw">in</span> <span class="bu">enumerate</span>(recommendations.itertuples(), start<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">. </span><span class="sc">{</span>row<span class="sc">.</span>title<span class="sc">}</span><span class="ss"> (Genre: </span><span class="sc">{</span>row<span class="sc">.</span>genre_ids<span class="sc">}</span><span class="ss">, Rating: </span><span class="sc">{</span>row<span class="sc">.</span>rating_average<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> recommendations</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-cache="true" data-execution_count="23">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>recommended_movies_linear1 <span class="op">=</span> content_based_movie_recs_linear(<span class="st">"The Gorgee"</span>, movie_content_df, linear_sim)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>recommended_movies_linear2 <span class="op">=</span> content_based_movie_recs_linear(<span class="st">"paprika"</span>, movie_content_df, linear_sim)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-cache="true" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>recommended_movies_linear1 <span class="op">=</span> content_based_movie_recs_linear(<span class="st">"The Gorgee"</span>, movie_content_df, linear_sim)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>recommended_movies_linear2 <span class="op">=</span> content_based_movie_recs_linear(<span class="st">"paprika"</span>, movie_content_df, linear_sim)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 🎬 Using matched movie: The Gorge
@@ -982,24 +780,24 @@ Sample Linear Kernel Similarity Scores:
 <li><p>Collects movie information like genre, rating, and where users can stream it</p></li>
 <li><p>Prints the information for the user</p></li>
 </ul>
-<div class="cell" data-cache="true" data-execution_count="25">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.sparse <span class="im">import</span> csr_matrix</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.neighbors <span class="im">import</span> NearestNeighbors</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ast</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Join the movies and reviews dataframes</span></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>movies_merged <span class="op">=</span> pd.merge(movies_df, movie_reviews_df, left_on<span class="op">=</span><span class="st">'id'</span>, right_on<span class="op">=</span><span class="st">'movie_id'</span>)</span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Pivot so that rows are movies, columns are a user, and values are ratings</span></span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>movies_pivot <span class="op">=</span> movies_merged.pivot_table(index<span class="op">=</span><span class="st">"title"</span>,columns<span class="op">=</span><span class="st">"id"</span>,values<span class="op">=</span><span class="st">"user_rating"</span>).fillna(<span class="dv">0</span>)</span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Create Compressed Sparse Row (CSR) matrix</span></span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>movies_matrix <span class="op">=</span> csr_matrix(movies_pivot.values)</span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit KNN model with cosine similarity as distance metric</span></span>
-<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>knn <span class="op">=</span> NearestNeighbors(metric <span class="op">=</span> <span class="st">"cosine"</span>, algorithm <span class="op">=</span> <span class="st">"brute"</span>)</span>
-<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>knn.fit(movies_matrix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="22">
+<div class="cell" data-cache="true" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.sparse <span class="im">import</span> csr_matrix</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.neighbors <span class="im">import</span> NearestNeighbors</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ast</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Join the movies and reviews dataframes</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>movies_merged <span class="op">=</span> pd.merge(movies_df, movie_reviews_df, left_on<span class="op">=</span><span class="st">'id'</span>, right_on<span class="op">=</span><span class="st">'movie_id'</span>)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Pivot so that rows are movies, columns are a user, and values are ratings</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>movies_pivot <span class="op">=</span> movies_merged.pivot_table(index<span class="op">=</span><span class="st">"title"</span>,columns<span class="op">=</span><span class="st">"id"</span>,values<span class="op">=</span><span class="st">"user_rating"</span>).fillna(<span class="dv">0</span>)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Create Compressed Sparse Row (CSR) matrix</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>movies_matrix <span class="op">=</span> csr_matrix(movies_pivot.values)</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit KNN model with cosine similarity as distance metric</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>knn <span class="op">=</span> NearestNeighbors(metric <span class="op">=</span> <span class="st">"cosine"</span>, algorithm <span class="op">=</span> <span class="st">"brute"</span>)</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>knn.fit(movies_matrix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
 <style>#sk-container-id-1 {
   /* Definition of color scheme common for light and dark mode */
   --sklearn-color-text: black;
@@ -1408,63 +1206,63 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 </div>
 </div>
 <p>The code above executes steps one and two of the collaborative recommendation. It prepares the data to be fit by a K Nearest Neighbors model by transforming it into a CSR user-item matrix, and then proceeds to fit the model.</p>
-<div class="cell" data-cache="true" data-execution_count="26">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> collaborative_based_movie_recs(title, movies_pivot, movies_merged, knn, num_recs<span class="op">=</span><span class="dv">10</span>):</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check if movie is within dataset</span></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> title <span class="kw">not</span> <span class="kw">in</span> movies_pivot.index:</span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ss">f"Movie '</span><span class="sc">{</span>title<span class="sc">}</span><span class="ss">' not found in the dataset."</span></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># List only popular streaming services to include</span></span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    popular_streaming_services <span class="op">=</span> [</span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Netflix'</span>, <span class="st">'Amazon Prime Video'</span>, <span class="st">'Hulu'</span>, <span class="st">'Disney+'</span>, <span class="st">'Apple TV'</span>, <span class="st">'HBO Max'</span>, </span>
-<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'YouTube'</span>, <span class="st">'Google Play Movies'</span>, <span class="st">'Peacock'</span>, <span class="st">'Paramount+'</span>,</span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Max'</span>, <span class="st">'Mubi'</span>, <span class="st">'Amazon Video'</span>, <span class="st">'Netflix basic with Ads'</span>, <span class="st">'Hoopla'</span>, <span class="st">'Vudu'</span>]</span>
-<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get index of movie to get recommendations for</span></span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>    query_idx <span class="op">=</span> movies_pivot.index.get_loc(title)</span>
-<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Given KNN model, find top 10 most similar movies based on user ratings</span></span>
-<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>    distances, indices <span class="op">=</span> knn.kneighbors(movies_pivot.iloc[query_idx, :].values.reshape(<span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>), n_neighbors<span class="op">=</span><span class="bu">min</span>(num_recs <span class="op">+</span> <span class="dv">1</span>, <span class="bu">len</span>(movies_pivot)))</span>
-<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>    recommendations <span class="op">=</span> []</span>
-<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="bu">len</span>(indices.flatten())):  <span class="co"># Skip the first movie (it's itself)</span></span>
-<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Extract movie name and information</span></span>
-<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>        movie_name <span class="op">=</span> movies_pivot.index[indices.flatten()[i]]</span>
-<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>        movie_info <span class="op">=</span> movie_content_df[movie_content_df[<span class="st">'movie_id'</span>] <span class="op">==</span> movies_merged[movies_merged[<span class="st">'title'</span>] <span class="op">==</span> movie_name][<span class="st">'movie_id'</span>].iloc[<span class="dv">0</span>]]</span>
-<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Check that the movie exists in content DataFrame</span></span>
-<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> movie_info.empty:</span>
-<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Extract movie rating and genres</span></span>
-<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>            avg_rating <span class="op">=</span> movie_info[<span class="st">'rating_average'</span>].iloc[<span class="dv">0</span>]</span>
-<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>            genre_ids <span class="op">=</span> movie_info[<span class="st">'genre_ids'</span>].iloc[<span class="dv">0</span>]</span>
-<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Convert genre ids to lists and join to make a string</span></span>
-<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="bu">isinstance</span>(genre_ids, <span class="bu">str</span>):</span>
-<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a>                genre_ids <span class="op">=</span> <span class="bu">eval</span>(genre_ids)</span>
-<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a>            genre_str <span class="op">=</span> <span class="st">", "</span>.join(<span class="bu">map</span>(<span class="bu">str</span>, genre_ids))</span>
-<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Collect watch provider information for each movie</span></span>
-<span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a>            watch_providers <span class="op">=</span> movie_info[<span class="st">'watch_providers'</span>].iloc[<span class="dv">0</span>]</span>
-<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Format info so it only contains the popular streaming services</span></span>
-<span id="cb29-37"><a href="#cb29-37" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="bu">isinstance</span>(watch_providers, <span class="bu">float</span>):</span>
-<span id="cb29-38"><a href="#cb29-38" aria-hidden="true" tabindex="-1"></a>              watch_providers <span class="op">=</span> <span class="st">""</span></span>
-<span id="cb29-39"><a href="#cb29-39" aria-hidden="true" tabindex="-1"></a>            filtered_watch_providers <span class="op">=</span> [provider.strip() <span class="cf">for</span> provider <span class="kw">in</span> watch_providers.split(<span class="st">','</span>) </span>
-<span id="cb29-40"><a href="#cb29-40" aria-hidden="true" tabindex="-1"></a>                            <span class="cf">if</span> <span class="bu">any</span>(popular.lower() <span class="kw">in</span> provider.lower() <span class="cf">for</span> popular <span class="kw">in</span> popular_streaming_services)]</span>
-<span id="cb29-41"><a href="#cb29-41" aria-hidden="true" tabindex="-1"></a>            formatted_watch_providers <span class="op">=</span> <span class="st">", "</span>.join(filtered_watch_providers)</span>
-<span id="cb29-42"><a href="#cb29-42" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Add all information to list of recommendations</span></span>
-<span id="cb29-43"><a href="#cb29-43" aria-hidden="true" tabindex="-1"></a>            recommendations.append((movie_name, genre_str, avg_rating, formatted_watch_providers))</span>
-<span id="cb29-44"><a href="#cb29-44" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb29-45"><a href="#cb29-45" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"🎬 Using matched movie: </span><span class="sc">{</span>title<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
-<span id="cb29-46"><a href="#cb29-46" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"📌 Top </span><span class="sc">{</span>num_recs<span class="sc">}</span><span class="ss"> movies similar to '</span><span class="sc">{</span>title<span class="sc">}</span><span class="ss">':"</span>)</span>
-<span id="cb29-47"><a href="#cb29-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-48"><a href="#cb29-48" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Print out movie information for each recommendation in formatted way</span></span>
-<span id="cb29-49"><a href="#cb29-49" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, (movie_name, genre, rating, watch_providers) <span class="kw">in</span> <span class="bu">enumerate</span>(recommendations, start<span class="op">=</span><span class="dv">1</span>):</span>
-<span id="cb29-50"><a href="#cb29-50" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">. </span><span class="sc">{</span>movie_name<span class="sc">}</span><span class="ss"> (Genre: </span><span class="sc">{</span>genre<span class="sc">}</span><span class="ss">, Rating: </span><span class="sc">{</span>rating<span class="sc">}</span><span class="ss">)"</span>)</span>
-<span id="cb29-51"><a href="#cb29-51" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"   📺 Where to stream: </span><span class="sc">{</span>watch_providers<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb29-52"><a href="#cb29-52" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-cache="true" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> collaborative_based_movie_recs(title, movies_pivot, movies_merged, knn, num_recs<span class="op">=</span><span class="dv">10</span>):</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check if movie is within dataset</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> title <span class="kw">not</span> <span class="kw">in</span> movies_pivot.index:</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ss">f"Movie '</span><span class="sc">{</span>title<span class="sc">}</span><span class="ss">' not found in the dataset."</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># List only popular streaming services to include</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    popular_streaming_services <span class="op">=</span> [</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Netflix'</span>, <span class="st">'Amazon Prime Video'</span>, <span class="st">'Hulu'</span>, <span class="st">'Disney+'</span>, <span class="st">'Apple TV'</span>, <span class="st">'HBO Max'</span>, </span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'YouTube'</span>, <span class="st">'Google Play Movies'</span>, <span class="st">'Peacock'</span>, <span class="st">'Paramount+'</span>,</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Max'</span>, <span class="st">'Mubi'</span>, <span class="st">'Amazon Video'</span>, <span class="st">'Netflix basic with Ads'</span>, <span class="st">'Hoopla'</span>, <span class="st">'Vudu'</span>]</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get index of movie to get recommendations for</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    query_idx <span class="op">=</span> movies_pivot.index.get_loc(title)</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Given KNN model, find top 10 most similar movies based on user ratings</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>    distances, indices <span class="op">=</span> knn.kneighbors(movies_pivot.iloc[query_idx, :].values.reshape(<span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>), n_neighbors<span class="op">=</span><span class="bu">min</span>(num_recs <span class="op">+</span> <span class="dv">1</span>, <span class="bu">len</span>(movies_pivot)))</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>    recommendations <span class="op">=</span> []</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="bu">len</span>(indices.flatten())):  <span class="co"># Skip the first movie (it's itself)</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Extract movie name and information</span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>        movie_name <span class="op">=</span> movies_pivot.index[indices.flatten()[i]]</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>        movie_info <span class="op">=</span> movie_content_df[movie_content_df[<span class="st">'movie_id'</span>] <span class="op">==</span> movies_merged[movies_merged[<span class="st">'title'</span>] <span class="op">==</span> movie_name][<span class="st">'movie_id'</span>].iloc[<span class="dv">0</span>]]</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Check that the movie exists in content DataFrame</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> movie_info.empty:</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Extract movie rating and genres</span></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>            avg_rating <span class="op">=</span> movie_info[<span class="st">'rating_average'</span>].iloc[<span class="dv">0</span>]</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>            genre_ids <span class="op">=</span> movie_info[<span class="st">'genre_ids'</span>].iloc[<span class="dv">0</span>]</span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Convert genre ids to lists and join to make a string</span></span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="bu">isinstance</span>(genre_ids, <span class="bu">str</span>):</span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>                genre_ids <span class="op">=</span> <span class="bu">eval</span>(genre_ids)</span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>            genre_str <span class="op">=</span> <span class="st">", "</span>.join(<span class="bu">map</span>(<span class="bu">str</span>, genre_ids))</span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Collect watch provider information for each movie</span></span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>            watch_providers <span class="op">=</span> movie_info[<span class="st">'watch_providers'</span>].iloc[<span class="dv">0</span>]</span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Format info so it only contains the popular streaming services</span></span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="bu">isinstance</span>(watch_providers, <span class="bu">float</span>):</span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>              watch_providers <span class="op">=</span> <span class="st">""</span></span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>            filtered_watch_providers <span class="op">=</span> [provider.strip() <span class="cf">for</span> provider <span class="kw">in</span> watch_providers.split(<span class="st">','</span>) </span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>                            <span class="cf">if</span> <span class="bu">any</span>(popular.lower() <span class="kw">in</span> provider.lower() <span class="cf">for</span> popular <span class="kw">in</span> popular_streaming_services)]</span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>            formatted_watch_providers <span class="op">=</span> <span class="st">", "</span>.join(filtered_watch_providers)</span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Add all information to list of recommendations</span></span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>            recommendations.append((movie_name, genre_str, avg_rating, formatted_watch_providers))</span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"🎬 Using matched movie: </span><span class="sc">{</span>title<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"📌 Top </span><span class="sc">{</span>num_recs<span class="sc">}</span><span class="ss"> movies similar to '</span><span class="sc">{</span>title<span class="sc">}</span><span class="ss">':"</span>)</span>
+<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Print out movie information for each recommendation in formatted way</span></span>
+<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, (movie_name, genre, rating, watch_providers) <span class="kw">in</span> <span class="bu">enumerate</span>(recommendations, start<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">. </span><span class="sc">{</span>movie_name<span class="sc">}</span><span class="ss"> (Genre: </span><span class="sc">{</span>genre<span class="sc">}</span><span class="ss">, Rating: </span><span class="sc">{</span>rating<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"   📺 Where to stream: </span><span class="sc">{</span>watch_providers<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb18-52"><a href="#cb18-52" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The function above takes in a movie title, and prints out the top 10 movies that are most similar to that input movie based on user rating patterns. Let’s try out this function on the best picture winner from this years Oscars.</p>
-<div class="cell" data-cache="true" data-execution_count="27">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>collaborative_based_movie_recs(<span class="st">'Anora'</span>, movies_pivot, movies_merged, knn, num_recs<span class="op">=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-cache="true" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>collaborative_based_movie_recs(<span class="st">'Anora'</span>, movies_pivot, movies_merged, knn, num_recs<span class="op">=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>🎬 Using matched movie: Anora
 
@@ -1522,95 +1320,95 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 <ul>
 <li>Display the top 10 content based movie recommendations for the user</li>
 </ul>
-<div class="cell" data-cache="true" data-execution_count="29">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> final_movie_recs(title):</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Retrieve top 100 content based recommendations</span></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  top_100_movies <span class="op">=</span> content_based_movie_recs(title, movie_content_df, cosine_sim, top_n<span class="op">=</span><span class="dv">101</span>)</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># List only popular streaming services to include</span></span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  popular_streaming_services <span class="op">=</span> [</span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Netflix'</span>, <span class="st">'Amazon Prime Video'</span>, <span class="st">'Hulu'</span>, <span class="st">'Disney+'</span>, <span class="st">'Apple TV'</span>, <span class="st">'HBO Max'</span>, </span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'YouTube'</span>, <span class="st">'Google Play Movies'</span>, <span class="st">'Peacock'</span>, <span class="st">'Paramount+'</span>,</span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Max'</span>, <span class="st">'Mubi'</span>, <span class="st">'Amazon Video'</span>, <span class="st">'Netflix basic with Ads'</span>, <span class="st">'Hoopla'</span>, <span class="st">'Vudu'</span>]</span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Extract row with movie content for given movie</span></span>
-<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>  movie_row <span class="op">=</span> movie_content_df[movie_content_df[<span class="st">"title"</span>] <span class="op">==</span> title]</span>
-<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Ensure the columns match by selecting the relevant columns</span></span>
-<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>  top_100_columns <span class="op">=</span> top_100_movies.columns</span>
-<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>  movie_row <span class="op">=</span> movie_row[top_100_columns]</span>
-<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Check if movie exists in content DataFrame</span></span>
-<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">not</span> movie_row.empty:</span>
-<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add movie to top 100 DataFrame so that this can be fed into other recommender</span></span>
-<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>    top_100_movies <span class="op">=</span> pd.concat([top_100_movies, movie_row], ignore_index<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If movie does not exist in contet DataFrame, let user know</span></span>
-<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">elif</span> movie_row.empty:</span>
-<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"Movie '</span><span class="sc">{</span>title<span class="sc">}</span><span class="ss">' not found in the dataset."</span></span>
-<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Extract specific movie id</span></span>
-<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>  movie_id <span class="op">=</span> movie_row[<span class="st">"movie_id"</span>].values[<span class="dv">0</span>] <span class="cf">if</span> <span class="kw">not</span> movie_row.empty <span class="cf">else</span> <span class="va">None</span></span>
-<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Check if movie does not have reviews in the reviews DataFrame</span></span>
-<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> movie_id <span class="kw">not</span> <span class="kw">in</span> movie_reviews_df[<span class="st">"movie_id"</span>].values:</span>
-<span id="cb32-30"><a href="#cb32-30" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Extract movie id and title of given movie</span></span>
-<span id="cb32-31"><a href="#cb32-31" aria-hidden="true" tabindex="-1"></a>      input_movie_id <span class="op">=</span> movie_row[<span class="st">"movie_id"</span>].values[<span class="dv">0</span>]</span>
-<span id="cb32-32"><a href="#cb32-32" aria-hidden="true" tabindex="-1"></a>      input_movie_title <span class="op">=</span> movie_row[<span class="st">"title"</span>].values[<span class="dv">0</span>]</span>
-<span id="cb32-33"><a href="#cb32-33" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb32-34"><a href="#cb32-34" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Remove the given movie from top 100 movies DataFrame</span></span>
-<span id="cb32-35"><a href="#cb32-35" aria-hidden="true" tabindex="-1"></a>      top_100_movies <span class="op">=</span> top_100_movies[</span>
-<span id="cb32-36"><a href="#cb32-36" aria-hidden="true" tabindex="-1"></a>            (top_100_movies[<span class="st">"movie_id"</span>] <span class="op">!=</span> input_movie_id) <span class="op">&amp;</span> </span>
-<span id="cb32-37"><a href="#cb32-37" aria-hidden="true" tabindex="-1"></a>            (top_100_movies[<span class="st">"title"</span>] <span class="op">!=</span> input_movie_title)]</span>
-<span id="cb32-38"><a href="#cb32-38" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb32-39"><a href="#cb32-39" aria-hidden="true" tabindex="-1"></a>      <span class="bu">print</span>(<span class="ss">f"🎬 Using matched movie: </span><span class="sc">{</span>input_movie_title<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
-<span id="cb32-40"><a href="#cb32-40" aria-hidden="true" tabindex="-1"></a>      <span class="bu">print</span>(<span class="ss">f"📌 Top 10 movies similar to '</span><span class="sc">{</span>input_movie_title<span class="sc">}</span><span class="ss">':"</span>)</span>
-<span id="cb32-41"><a href="#cb32-41" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb32-42"><a href="#cb32-42" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Format and print top 10 rows of the top 100 DataFrame</span></span>
-<span id="cb32-43"><a href="#cb32-43" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> counter, (i, row) <span class="kw">in</span> <span class="bu">enumerate</span>(top_100_movies.head(<span class="dv">10</span>).iterrows(), <span class="dv">1</span>):</span>
-<span id="cb32-44"><a href="#cb32-44" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Extract genre id for each movie</span></span>
-<span id="cb32-45"><a href="#cb32-45" aria-hidden="true" tabindex="-1"></a>        genres <span class="op">=</span> row[<span class="st">'genre_ids'</span>]</span>
-<span id="cb32-46"><a href="#cb32-46" aria-hidden="true" tabindex="-1"></a>        <span class="co"># If genre is a string, convert to list and format to joined string for printing</span></span>
-<span id="cb32-47"><a href="#cb32-47" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">isinstance</span>(genres, <span class="bu">str</span>):</span>
-<span id="cb32-48"><a href="#cb32-48" aria-hidden="true" tabindex="-1"></a>            genres <span class="op">=</span> <span class="bu">eval</span>(genres)</span>
-<span id="cb32-49"><a href="#cb32-49" aria-hidden="true" tabindex="-1"></a>        genres <span class="op">=</span> <span class="st">', '</span>.join(genres)</span>
-<span id="cb32-50"><a href="#cb32-50" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>counter<span class="sc">}</span><span class="ss">. </span><span class="sc">{</span>row[<span class="st">'title'</span>]<span class="sc">}</span><span class="ss"> (Genre: </span><span class="sc">{</span>genres<span class="sc">}</span><span class="ss">, Rating: </span><span class="sc">{</span>row[<span class="st">'rating_average'</span>]<span class="sc">:.2f}</span><span class="ss">)"</span>)</span>
-<span id="cb32-51"><a href="#cb32-51" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb32-52"><a href="#cb32-52" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Select and format only the popular watch providers</span></span>
-<span id="cb32-53"><a href="#cb32-53" aria-hidden="true" tabindex="-1"></a>        available_providers <span class="op">=</span> [provider <span class="cf">for</span> provider <span class="kw">in</span> row[<span class="st">'watch_providers'</span>].split(<span class="st">', '</span>) <span class="cf">if</span> provider <span class="kw">in</span> popular_streaming_services]</span>
-<span id="cb32-54"><a href="#cb32-54" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb32-55"><a href="#cb32-55" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Print out all available streaming services</span></span>
-<span id="cb32-56"><a href="#cb32-56" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> available_providers:</span>
-<span id="cb32-57"><a href="#cb32-57" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"   📺 Where to stream: </span><span class="sc">{</span><span class="st">', '</span><span class="sc">.</span>join(available_providers)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb32-58"><a href="#cb32-58" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>()</span>
-<span id="cb32-59"><a href="#cb32-59" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb32-60"><a href="#cb32-60" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If movie does have reviews in the reviews DataFrame</span></span>
-<span id="cb32-61"><a href="#cb32-61" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span>:</span>
-<span id="cb32-62"><a href="#cb32-62" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Select all unique movies in the top 100 content based recommendations</span></span>
-<span id="cb32-63"><a href="#cb32-63" aria-hidden="true" tabindex="-1"></a>    movie_ids_set <span class="op">=</span> <span class="bu">set</span>(top_100_movies[<span class="st">"movie_id"</span>])</span>
-<span id="cb32-64"><a href="#cb32-64" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Subset movies_df to include only the top 100 movies </span></span>
-<span id="cb32-65"><a href="#cb32-65" aria-hidden="true" tabindex="-1"></a>    movies_subset <span class="op">=</span> movies_df[movies_df[<span class="st">"id"</span>].isin(movie_ids_set)]</span>
-<span id="cb32-66"><a href="#cb32-66" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Subset movie_reviews_df to incude only the top 100 movies</span></span>
-<span id="cb32-67"><a href="#cb32-67" aria-hidden="true" tabindex="-1"></a>    reviews_subset <span class="op">=</span> movie_reviews_df[movie_reviews_df[<span class="st">"movie_id"</span>].isin(movie_ids_set)]</span>
-<span id="cb32-68"><a href="#cb32-68" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Merge both subsetted DataFrames: movies and their reviews</span></span>
-<span id="cb32-69"><a href="#cb32-69" aria-hidden="true" tabindex="-1"></a>    movies_merged <span class="op">=</span> movies_subset.merge(reviews_subset, left_on<span class="op">=</span><span class="st">"id"</span>, right_on<span class="op">=</span><span class="st">"movie_id"</span>)</span>
-<span id="cb32-70"><a href="#cb32-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-71"><a href="#cb32-71" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Pivot the merged table so that rows are movies, columns are users, values are those users ratings</span></span>
-<span id="cb32-72"><a href="#cb32-72" aria-hidden="true" tabindex="-1"></a>    movies_pivot <span class="op">=</span> movies_merged.pivot_table(index<span class="op">=</span><span class="st">"title"</span>,columns<span class="op">=</span><span class="st">"id"</span>,values<span class="op">=</span><span class="st">"user_rating"</span>).fillna(<span class="dv">0</span>)</span>
-<span id="cb32-73"><a href="#cb32-73" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb32-74"><a href="#cb32-74" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create Compressed Sparse Row (CSR) matrix of pivoted table</span></span>
-<span id="cb32-75"><a href="#cb32-75" aria-hidden="true" tabindex="-1"></a>    movies_matrix <span class="op">=</span> csr_matrix(movies_pivot.values)</span>
-<span id="cb32-76"><a href="#cb32-76" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb32-77"><a href="#cb32-77" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Fit KNN model with cosine similarity as distance metric</span></span>
-<span id="cb32-78"><a href="#cb32-78" aria-hidden="true" tabindex="-1"></a>    knn <span class="op">=</span> NearestNeighbors(metric <span class="op">=</span> <span class="st">"cosine"</span>, algorithm <span class="op">=</span> <span class="st">"brute"</span>)</span>
-<span id="cb32-79"><a href="#cb32-79" aria-hidden="true" tabindex="-1"></a>    knn.fit(movies_matrix)</span>
-<span id="cb32-80"><a href="#cb32-80" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb32-81"><a href="#cb32-81" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Run top 100 recs through collaborative recommender to get top 10 recommendations</span></span>
-<span id="cb32-82"><a href="#cb32-82" aria-hidden="true" tabindex="-1"></a>    final_recommendations <span class="op">=</span> collaborative_based_movie_recs(title, movies_pivot, movies_merged, knn, num_recs<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb32-83"><a href="#cb32-83" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb32-84"><a href="#cb32-84" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> final_recommendations</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-cache="true" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> final_movie_recs(title):</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Retrieve top 100 content based recommendations</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  top_100_movies <span class="op">=</span> content_based_movie_recs(title, movie_content_df, cosine_sim, top_n<span class="op">=</span><span class="dv">101</span>)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># List only popular streaming services to include</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  popular_streaming_services <span class="op">=</span> [</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Netflix'</span>, <span class="st">'Amazon Prime Video'</span>, <span class="st">'Hulu'</span>, <span class="st">'Disney+'</span>, <span class="st">'Apple TV'</span>, <span class="st">'HBO Max'</span>, </span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'YouTube'</span>, <span class="st">'Google Play Movies'</span>, <span class="st">'Peacock'</span>, <span class="st">'Paramount+'</span>,</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Max'</span>, <span class="st">'Mubi'</span>, <span class="st">'Amazon Video'</span>, <span class="st">'Netflix basic with Ads'</span>, <span class="st">'Hoopla'</span>, <span class="st">'Vudu'</span>]</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Extract row with movie content for given movie</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  movie_row <span class="op">=</span> movie_content_df[movie_content_df[<span class="st">"title"</span>] <span class="op">==</span> title]</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Ensure the columns match by selecting the relevant columns</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  top_100_columns <span class="op">=</span> top_100_movies.columns</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>  movie_row <span class="op">=</span> movie_row[top_100_columns]</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Check if movie exists in content DataFrame</span></span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">not</span> movie_row.empty:</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add movie to top 100 DataFrame so that this can be fed into other recommender</span></span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>    top_100_movies <span class="op">=</span> pd.concat([top_100_movies, movie_row], ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If movie does not exist in contet DataFrame, let user know</span></span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">elif</span> movie_row.empty:</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"Movie '</span><span class="sc">{</span>title<span class="sc">}</span><span class="ss">' not found in the dataset."</span></span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Extract specific movie id</span></span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>  movie_id <span class="op">=</span> movie_row[<span class="st">"movie_id"</span>].values[<span class="dv">0</span>] <span class="cf">if</span> <span class="kw">not</span> movie_row.empty <span class="cf">else</span> <span class="va">None</span></span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Check if movie does not have reviews in the reviews DataFrame</span></span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> movie_id <span class="kw">not</span> <span class="kw">in</span> movie_reviews_df[<span class="st">"movie_id"</span>].values:</span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Extract movie id and title of given movie</span></span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>      input_movie_id <span class="op">=</span> movie_row[<span class="st">"movie_id"</span>].values[<span class="dv">0</span>]</span>
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a>      input_movie_title <span class="op">=</span> movie_row[<span class="st">"title"</span>].values[<span class="dv">0</span>]</span>
+<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Remove the given movie from top 100 movies DataFrame</span></span>
+<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>      top_100_movies <span class="op">=</span> top_100_movies[</span>
+<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>            (top_100_movies[<span class="st">"movie_id"</span>] <span class="op">!=</span> input_movie_id) <span class="op">&amp;</span> </span>
+<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a>            (top_100_movies[<span class="st">"title"</span>] <span class="op">!=</span> input_movie_title)]</span>
+<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>      <span class="bu">print</span>(<span class="ss">f"🎬 Using matched movie: </span><span class="sc">{</span>input_movie_title<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a>      <span class="bu">print</span>(<span class="ss">f"📌 Top 10 movies similar to '</span><span class="sc">{</span>input_movie_title<span class="sc">}</span><span class="ss">':"</span>)</span>
+<span id="cb21-41"><a href="#cb21-41" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb21-42"><a href="#cb21-42" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Format and print top 10 rows of the top 100 DataFrame</span></span>
+<span id="cb21-43"><a href="#cb21-43" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> counter, (i, row) <span class="kw">in</span> <span class="bu">enumerate</span>(top_100_movies.head(<span class="dv">10</span>).iterrows(), <span class="dv">1</span>):</span>
+<span id="cb21-44"><a href="#cb21-44" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Extract genre id for each movie</span></span>
+<span id="cb21-45"><a href="#cb21-45" aria-hidden="true" tabindex="-1"></a>        genres <span class="op">=</span> row[<span class="st">'genre_ids'</span>]</span>
+<span id="cb21-46"><a href="#cb21-46" aria-hidden="true" tabindex="-1"></a>        <span class="co"># If genre is a string, convert to list and format to joined string for printing</span></span>
+<span id="cb21-47"><a href="#cb21-47" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">isinstance</span>(genres, <span class="bu">str</span>):</span>
+<span id="cb21-48"><a href="#cb21-48" aria-hidden="true" tabindex="-1"></a>            genres <span class="op">=</span> <span class="bu">eval</span>(genres)</span>
+<span id="cb21-49"><a href="#cb21-49" aria-hidden="true" tabindex="-1"></a>        genres <span class="op">=</span> <span class="st">', '</span>.join(genres)</span>
+<span id="cb21-50"><a href="#cb21-50" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>counter<span class="sc">}</span><span class="ss">. </span><span class="sc">{</span>row[<span class="st">'title'</span>]<span class="sc">}</span><span class="ss"> (Genre: </span><span class="sc">{</span>genres<span class="sc">}</span><span class="ss">, Rating: </span><span class="sc">{</span>row[<span class="st">'rating_average'</span>]<span class="sc">:.2f}</span><span class="ss">)"</span>)</span>
+<span id="cb21-51"><a href="#cb21-51" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb21-52"><a href="#cb21-52" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Select and format only the popular watch providers</span></span>
+<span id="cb21-53"><a href="#cb21-53" aria-hidden="true" tabindex="-1"></a>        available_providers <span class="op">=</span> [provider <span class="cf">for</span> provider <span class="kw">in</span> row[<span class="st">'watch_providers'</span>].split(<span class="st">', '</span>) <span class="cf">if</span> provider <span class="kw">in</span> popular_streaming_services]</span>
+<span id="cb21-54"><a href="#cb21-54" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb21-55"><a href="#cb21-55" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Print out all available streaming services</span></span>
+<span id="cb21-56"><a href="#cb21-56" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> available_providers:</span>
+<span id="cb21-57"><a href="#cb21-57" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"   📺 Where to stream: </span><span class="sc">{</span><span class="st">', '</span><span class="sc">.</span>join(available_providers)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb21-58"><a href="#cb21-58" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>()</span>
+<span id="cb21-59"><a href="#cb21-59" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb21-60"><a href="#cb21-60" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If movie does have reviews in the reviews DataFrame</span></span>
+<span id="cb21-61"><a href="#cb21-61" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span>:</span>
+<span id="cb21-62"><a href="#cb21-62" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Select all unique movies in the top 100 content based recommendations</span></span>
+<span id="cb21-63"><a href="#cb21-63" aria-hidden="true" tabindex="-1"></a>    movie_ids_set <span class="op">=</span> <span class="bu">set</span>(top_100_movies[<span class="st">"movie_id"</span>])</span>
+<span id="cb21-64"><a href="#cb21-64" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Subset movies_df to include only the top 100 movies </span></span>
+<span id="cb21-65"><a href="#cb21-65" aria-hidden="true" tabindex="-1"></a>    movies_subset <span class="op">=</span> movies_df[movies_df[<span class="st">"id"</span>].isin(movie_ids_set)]</span>
+<span id="cb21-66"><a href="#cb21-66" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Subset movie_reviews_df to incude only the top 100 movies</span></span>
+<span id="cb21-67"><a href="#cb21-67" aria-hidden="true" tabindex="-1"></a>    reviews_subset <span class="op">=</span> movie_reviews_df[movie_reviews_df[<span class="st">"movie_id"</span>].isin(movie_ids_set)]</span>
+<span id="cb21-68"><a href="#cb21-68" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Merge both subsetted DataFrames: movies and their reviews</span></span>
+<span id="cb21-69"><a href="#cb21-69" aria-hidden="true" tabindex="-1"></a>    movies_merged <span class="op">=</span> movies_subset.merge(reviews_subset, left_on<span class="op">=</span><span class="st">"id"</span>, right_on<span class="op">=</span><span class="st">"movie_id"</span>)</span>
+<span id="cb21-70"><a href="#cb21-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-71"><a href="#cb21-71" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Pivot the merged table so that rows are movies, columns are users, values are those users ratings</span></span>
+<span id="cb21-72"><a href="#cb21-72" aria-hidden="true" tabindex="-1"></a>    movies_pivot <span class="op">=</span> movies_merged.pivot_table(index<span class="op">=</span><span class="st">"title"</span>,columns<span class="op">=</span><span class="st">"id"</span>,values<span class="op">=</span><span class="st">"user_rating"</span>).fillna(<span class="dv">0</span>)</span>
+<span id="cb21-73"><a href="#cb21-73" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-74"><a href="#cb21-74" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create Compressed Sparse Row (CSR) matrix of pivoted table</span></span>
+<span id="cb21-75"><a href="#cb21-75" aria-hidden="true" tabindex="-1"></a>    movies_matrix <span class="op">=</span> csr_matrix(movies_pivot.values)</span>
+<span id="cb21-76"><a href="#cb21-76" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-77"><a href="#cb21-77" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Fit KNN model with cosine similarity as distance metric</span></span>
+<span id="cb21-78"><a href="#cb21-78" aria-hidden="true" tabindex="-1"></a>    knn <span class="op">=</span> NearestNeighbors(metric <span class="op">=</span> <span class="st">"cosine"</span>, algorithm <span class="op">=</span> <span class="st">"brute"</span>)</span>
+<span id="cb21-79"><a href="#cb21-79" aria-hidden="true" tabindex="-1"></a>    knn.fit(movies_matrix)</span>
+<span id="cb21-80"><a href="#cb21-80" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-81"><a href="#cb21-81" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Run top 100 recs through collaborative recommender to get top 10 recommendations</span></span>
+<span id="cb21-82"><a href="#cb21-82" aria-hidden="true" tabindex="-1"></a>    final_recommendations <span class="op">=</span> collaborative_based_movie_recs(title, movies_pivot, movies_merged, knn, num_recs<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb21-83"><a href="#cb21-83" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-84"><a href="#cb21-84" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> final_recommendations</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The function defined above will retrieve the final top 10 movie recommendations for a given movie, based on content and reviews if that data is present. Let’s see what results we get for the same movie as before.</p>
-<div class="cell" data-cache="true" data-execution_count="30">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>final_movie_recs(<span class="st">"Anora"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-cache="true" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>final_movie_recs(<span class="st">"Anora"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>🎬 Using matched movie: Anora
 
