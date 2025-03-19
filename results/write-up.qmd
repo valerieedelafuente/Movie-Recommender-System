@@ -427,6 +427,8 @@ In this section, we are focusing on EDA to better understand the data. This is t
 ### Variables
 
 ```{python}
+import seaborn as sns
+import matplotlib.pyplot as plt
 from rich.console import Console
 from rich.table import Table
 
