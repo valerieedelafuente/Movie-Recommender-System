@@ -40,7 +40,12 @@ To use the TMDb API, users must create an account on [The Movie Database website
 
 #### Content-based filtering
 
-```{python, eval=FALSE}
+```{python}
+#| eval: false
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 # Loading necessary packages
 import requests
 import pandas as pd
@@ -125,7 +130,12 @@ The system queries the following TMDb API endpoints to gather relevant movie dat
 
 #### Collaborative-based filtering
 
-```{python, eval=FALSE}
+```{python}
+#| eval: false
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 # Load necessary packages
 import requests
 import pandas as pd
@@ -201,6 +211,10 @@ After extracting all of the data from the online database, there are some prepro
 ### Content-based filtering
 
 ```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 # Creates the dictionary of genre IDs and names
 # Load necessary packages
 import requests
@@ -244,6 +258,10 @@ pd.options.mode.chained_assignment = None
 ```
 
 ```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 # Load necessary packages
 import pandas as pd
 import ast
@@ -274,6 +292,10 @@ movie_content_df = content_preprocessing(movie_content_df)
 The code chunk above applies the genre dictionary to extract genre categories. It also retains relevant columns in the DataFrame.
 
 ```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 # Load necessary packages
 import pandas as pd
 import pycountry # for languages convertion
@@ -356,6 +378,10 @@ The following edits were made in the code chunk above:
 ### Collaborative-based filtering
 
 ```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 import pandas as pd
 import ast
 
@@ -384,6 +410,10 @@ movies_df = collab_preproccesing(movies_df)
 To begin for the collaborative based preprocessing, a similar pipeline to what was used for content based is followed. The genre ids are mapped to genres names and the relevant columns are retained.
 
 ```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 # Creating a `user_id` column
 user_id_map = {}  # Dictionary to store author -> user_id mapping
 current_id = 1
@@ -427,6 +457,10 @@ In this section, we are focusing on EDA to better understand the data. This is t
 ### Variables
 
 ```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 import seaborn as sns
 import matplotlib.pyplot as plt
 from rich.console import Console
@@ -456,23 +490,31 @@ console.print(table)
 ### Missing Data
 
 ```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 import warnings 
 warnings.simplefilter(action ='ignore', category = FutureWarning)
 
 #plotting missing values for movie_content_df
-  plt.figure(figsize = (18,8))
-  sns.heatmap(movie_content_df.isnull(), cmap = "Purples")
-  plt.xlabel('Variables')
-  plt.ylabel('Column Number')
-  plt.xticks(rotation = 80)
-  plt.title('Missing Values for movie_content_df')
-  plt.subplots_adjust(bottom = 0.25)
-  plt.show()
+plt.figure(figsize = (18,8))
+sns.heatmap(movie_content_df.isnull(), cmap = "Purples")
+plt.xlabel('Variables')
+plt.ylabel('Column Number')
+plt.xticks(rotation = 80)
+plt.title('Missing Values for movie_content_df')
+plt.subplots_adjust(bottom = 0.25)
+plt.show()
 ```
 
 The dataset `movie_content_df` is missing some observations in `genre_ids`, `cast_names`, and `watch_providers`. It appears that movies missing watch provider information are those that have been newly released.
 
 ```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 #plotting missing values for movie_reviews_df
 plt.figure(figsize = (18,8))
 sns.heatmap(movie_reviews_df.isnull(), cmap = "Purples")
@@ -488,6 +530,10 @@ While in the `movie_reviews_df`, it is missing a majority of `user_rating`. It c
 #### Popular Genres
 
 ```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 #separating genres and exploding
 movie_content_df['genre_ids'] = movie_content_df['genre_ids'].fillna('').astype(str)
 movie_content_df['genre_list'] = movie_content_df['genre_ids'].apply(lambda x: [genre.strip() for genre in x.split(',')])
@@ -510,6 +556,10 @@ About 1600 of movies are categorized under Drama, making it the most popular gen
 #### Popular Movie Languages
 
 ```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 #countplot for languages
 plt.figure(figsize = (12, 6))
 sns.countplot(y = 'original_language', data = movie_content_df, order = movie_content_df['original_language'].value_counts(ascending = False).index[:5])
@@ -525,6 +575,10 @@ We can see that the majority of the movies in our dataset have their original la
 #### Popular Actors
 
 ```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 #separating actors and exploding
 movie_content_df['actors_list'] = movie_content_df['cast_names'].str.split(',')
 movies_exploded = movie_content_df.explode('actors_list')
@@ -546,6 +600,10 @@ As we can see "Jr." is the most common actor in our movie dataset with a count o
 #### Providers
 
 ```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 movie_content_df['providers_list'] = movie_content_df['watch_providers'].str.split(',')
 movies_exploded = movie_content_df.explode('providers_list')
 
@@ -567,8 +625,12 @@ Our top providers, 'Apple TV', 'Google Play Movies', dominate the dataset, offer
 #### Reviewers
 
 ```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 #counting how many times an author reviewed movies
-user_review_counts = movie_reviews_df['author'].value_counts()
+user_review_counts = movie_reviews_df['user_id'].value_counts()
 
 # Bar chart for top reviewers
 plt.figure(figsize=(12,6))
@@ -596,16 +658,10 @@ Content-based filtering recommends movies based on their features rather than us
 -   Compute cosine similarity to measure the pairwise similarity between movies
 
 ```{python}
-#| echo: false
-#| results: hide
-
-import pandas as pd
-file_path = "~/Desktop/Pstat134/Pstat134-Movie-Recommender-System/data_final/movie_contents copy.csv"
-
-movie_content_df = pd.read_csv(file_path)
-```
-
-```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 # Combine relevent features
 movie_content_df["combined_features"] = (
     movie_content_df["genre_ids"].fillna("").str.replace(",", " ") + " | " +  
@@ -633,6 +689,10 @@ print("Sample Cosine Similarity Scores:\n", cosine_sim[:5, :5])
 -   Compute linear kernel similarity
 
 ```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
@@ -673,57 +733,68 @@ print("Sample Linear Kernel Similarity Scores:\n", linear_sim[:5, :5])
     -   **Cosine Similarity (text only)**
     -   **Linear Kernel Similarity (text + numeric)**
 
-    ```{python}
-    from difflib import get_close_matches
-
-    def content_based_movie_recs(movie_title, movie_content_df, cosine_sim, top_n=11):
-        # prepprocess input: remove space and lowercase
-        clean_title = movie_title.strip().lower()
-
-        # preprocess movie title
-        movie_content_df["clean_title"] = movie_content_df["title"].str.strip().str.lower()
-
-        # find the most similar movie
-        possible_matches = get_close_matches(clean_title, movie_content_df["clean_title"], n=1, cutoff=0.7)
-
-        
-        if possible_matches:
-            clean_title = possible_matches[0]
-
-        
-        movie_idx = movie_content_df[movie_content_df["clean_title"] == clean_title].index
-
-        if movie_idx.empty:
-            return f"Movie '{movie_title.strip()}' not found. Please check the title."
-
-
-        movie_idx = movie_idx[0]
-
-       
-        similarity_scores = list(enumerate(cosine_sim[movie_idx]))
-        similarity_scores = sorted(similarity_scores, key=lambda x: x[1], reverse=True)[1:top_n+1]
-
-       
-        top_movies = similarity_scores[1:top_n+1]
-
-        
-        recommendations = movie_content_df.iloc[[i[0] for i in top_movies]][["title", "genre_ids", "rating_average"]]
-
-        print(f"\n🎬 Using matched movie: {movie_content_df.iloc[movie_idx]['title']}")
-        print(f"\n📌 Top 10 movies similar to '{movie_title.strip()}':")
-        for i, row in enumerate(recommendations.itertuples(), start=1):
-            print(f"{i}. {row.title} (Genre: {row.genre_ids}, Rating: {row.rating_average})")
-
-        return recommendations
-
-    ```
-
 ```{python}
-recommendations1 = content_based_movie_recs("The Gorgee", movie_content_df, cosine_sim)
-recommendations2 = content_based_movie_recs("Paprika", movie_content_df, cosine_sim)
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
+from difflib import get_close_matches
+
+def content_based_movie_recs_print(movie_title, movie_content_df, cosine_sim, top_n=11):
+    # prepprocess input: remove space and lowercase
+    clean_title = movie_title.strip().lower()
+
+    # preprocess movie title
+    movie_content_df["clean_title"] = movie_content_df["title"].str.strip().str.lower()
+
+    # find the most similar movie
+    possible_matches = get_close_matches(clean_title, movie_content_df["clean_title"], n=1, cutoff=0.7)
+
+    
+    if possible_matches:
+        clean_title = possible_matches[0]
+
+    
+    movie_idx = movie_content_df[movie_content_df["clean_title"] == clean_title].index
+
+    if movie_idx.empty:
+        return f"Movie '{movie_title.strip()}' not found. Please check the title."
+
+
+    movie_idx = movie_idx[0]
+
+   
+    similarity_scores = list(enumerate(cosine_sim[movie_idx]))
+    similarity_scores = sorted(similarity_scores, key=lambda x: x[1], reverse=True)[1:top_n+1]
+
+   
+    top_movies = similarity_scores[1:top_n+1]
+
+    
+    recommendations = movie_content_df.iloc[[i[0] for i in top_movies]][["title", "genre_ids", "rating_average"]]
+
+    print(f"\n🎬 Using matched movie: {movie_content_df.iloc[movie_idx]['title']}")
+    print(f"\n📌 Top 10 movies similar to '{movie_title.strip()}':")
+    for i, row in enumerate(recommendations.itertuples(), start=1):
+        print(f"{i}. {row.title} (Genre: {row.genre_ids}, Rating: {row.rating_average})")
+
+    return recommendations
 ```
 
 ```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
+recommendations1 = content_based_movie_recs_print("The Gorgee", movie_content_df, cosine_sim)
+recommendations2 = content_based_movie_recs_print("Paprika", movie_content_df, cosine_sim)
+```
+
+```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 from difflib import get_close_matches
 
 def content_based_movie_recs_linear(movie_title, movie_content_df, linear_sim, top_n=10):
@@ -765,10 +836,13 @@ def content_based_movie_recs_linear(movie_title, movie_content_df, linear_sim, t
         print(f"{i}. {row.title} (Genre: {row.genre_ids}, Rating: {row.rating_average})")
 
     return recommendations
-
 ```
 
 ```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 recommended_movies_linear1 = content_based_movie_recs_linear("The Gorgee", movie_content_df, linear_sim)
 recommended_movies_linear2 = content_based_movie_recs_linear("paprika", movie_content_df, linear_sim)
 ```
@@ -810,6 +884,14 @@ pd.options.mode.chained_assignment = None
 ```
 
 ```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
+from scipy.sparse import csr_matrix
+from sklearn.neighbors import NearestNeighbors
+import ast
+
 # Join the movies and reviews dataframes
 movies_merged = pd.merge(movies_df, movie_reviews_df, left_on='id', right_on='movie_id')
 
@@ -827,6 +909,10 @@ knn.fit(movies_matrix)
 The code above executes steps one and two of the collaborative recommendation. It prepares the data to be fit by a K Nearest Neighbors model by transforming it into a CSR user-item matrix, and then proceeds to fit the model.
 
 ```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 def collaborative_based_movie_recs(title, movies_pivot, movies_merged, knn, num_recs=10):
     # Check if movie is within dataset
     if title not in movies_pivot.index:
@@ -842,8 +928,8 @@ def collaborative_based_movie_recs(title, movies_pivot, movies_merged, knn, num_
     query_idx = movies_pivot.index.get_loc(title)
     
     # Given KNN model, find top 10 most similar movies based on user ratings
-    distances, indices = knn.kneighbors(movies_pivot.iloc[query_idx, :].values.reshape(1, -1), n_neighbors=num_recs + 1)
-    
+    distances, indices = knn.kneighbors(movies_pivot.iloc[query_idx, :].values.reshape(1, -1), n_neighbors=min(num_recs + 1, len(movies_pivot)))
+
     recommendations = []
     for i in range(1, len(indices.flatten())):  # Skip the first movie (it's itself)
         # Extract movie name and information
@@ -873,7 +959,7 @@ def collaborative_based_movie_recs(title, movies_pivot, movies_merged, knn, num_
     
     print(f"🎬 Using matched movie: {title}\n")
     print(f"📌 Top {num_recs} movies similar to '{title}':")
-    
+
     # Print out movie information for each recommendation in formatted way
     for i, (movie_name, genre, rating, watch_providers) in enumerate(recommendations, start=1):
         print(f"{i}. {movie_name} (Genre: {genre}, Rating: {rating})")
@@ -884,6 +970,10 @@ def collaborative_based_movie_recs(title, movies_pivot, movies_merged, knn, num_
 The function above takes in a movie title, and prints out the top 10 movies that are most similar to that input movie based on user rating patterns. Let's try out this function on the best picture winner from this years Oscars.
 
 ```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 collaborative_based_movie_recs('Anora', movies_pivot, movies_merged, knn, num_recs=10)
 ```
 
@@ -914,10 +1004,52 @@ To incorporate both the content based and collaborative based recommender system
 -   Display the top 10 content based movie recommendations for the user
 
 ```{python}
+#| echo: false
+#| results: hide
+def content_based_movie_recs(movie_title, movie_content_df, cosine_sim, top_n=11):
+    # prepprocess input: remove space and lowercase
+    clean_title = movie_title.strip().lower()
+
+    # preprocess movie title
+    movie_content_df["clean_title"] = movie_content_df["title"].str.strip().str.lower()
+
+    # find the most similar movie
+    possible_matches = get_close_matches(clean_title, movie_content_df["clean_title"], n=1, cutoff=0.7)
+
+    
+    if possible_matches:
+        clean_title = possible_matches[0]
+
+    
+    movie_idx = movie_content_df[movie_content_df["clean_title"] == clean_title].index
+
+    if movie_idx.empty:
+        return f"Movie '{movie_title.strip()}' not found. Please check the title."
+
+
+    movie_idx = movie_idx[0]
+
+   
+    similarity_scores = list(enumerate(cosine_sim[movie_idx]))
+    similarity_scores = sorted(similarity_scores, key=lambda x: x[1], reverse=True)[1:top_n+1]
+
+   
+    top_movies = similarity_scores[1:top_n+1]
+
+    
+    recommendations = movie_content_df.iloc[[i[0] for i in top_movies]][["title", "genre_ids", "rating_average", 'movie_id']]
+
+    return recommendations
+```
+
+```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 def final_movie_recs(title):
   # Retrieve top 100 content based recommendations
   top_100_movies = content_based_movie_recs(title, movie_content_df, cosine_sim, top_n=101)
-  
   # List only popular streaming services to include
   popular_streaming_services = [
     'Netflix', 'Amazon Prime Video', 'Hulu', 'Disney+', 'Apple TV', 'HBO Max', 
@@ -926,6 +1058,10 @@ def final_movie_recs(title):
       
   # Extract row with movie content for given movie
   movie_row = movie_content_df[movie_content_df["title"] == title]
+  
+  # Ensure the columns match by selecting the relevant columns
+  top_100_columns = top_100_movies.columns
+  movie_row = movie_row[top_100_columns]
   
   # Check if movie exists in content DataFrame
   if not movie_row.empty:
@@ -980,7 +1116,7 @@ def final_movie_recs(title):
     reviews_subset = movie_reviews_df[movie_reviews_df["movie_id"].isin(movie_ids_set)]
     # Merge both subsetted DataFrames: movies and their reviews
     movies_merged = movies_subset.merge(reviews_subset, left_on="id", right_on="movie_id")
-    
+
     # Pivot the merged table so that rows are movies, columns are users, values are those users ratings
     movies_pivot = movies_merged.pivot_table(index="title",columns="id",values="user_rating").fillna(0)
     
@@ -1000,10 +1136,14 @@ def final_movie_recs(title):
 The function defined above will retrieve the final top 10 movie recommendations for a given movie, based on content and reviews if that data is present. Let's see what results we get for the same movie as before.
 
 ```{python}
+#| echo: true
+#| warning: false
+#| message: false
+#| cache: true
 final_movie_recs("Anora")
 ```
 
-These top ten recommendations are different than the collaborative and content based recommendations for this movie because now it is using a combination of the two recommender systems. It begins by narrowing down from a list of 4,000 movies to only the top 100 that have similar genres, casts, and watch providers. From there, those top 100 are filtered down to the top 10 movies that were rated similar to Anora.
+These top ten recommendations are different than the collaborative and content based recommendations because now it is using a combination of the two recommender systems. It begins by narrowing down from a list of 4,000 movies to only the top 100 that have similar genres, casts, and watch providers. From there, those top 100 are filtered down to the top 10 movies that were rated similar to Anora.
 
 ### Evaluation
 
@@ -1018,11 +1158,5 @@ To improve upon our content based recommendations, we also implement a collabora
 To get the best of both worlds for the finalized recommender system, we implemented a hybrid cascade approach that was able to integrate both content and collaborative based recommendations. This system will give the most well rounded recommendations because it is taking into account content features of the film, as well as how users rated it. The drawbacks to this approach are that not every single movie that has content data also has user rating data. Of the 4,000 unique movies in `movies_df`, only 1,668 of them also had data on their reviews. This led to the partially cascade approach of the finalized recommender system, which included collaborative recommendations for the movies that had ample review data. In the future, we could ideally collect enough user rating data to span across all movies in the content DataFrame so that the final hybrid recommendation was able to take both methods into account.
 
 ## Conclusion
-
--   Summarize the project's achievements.
-
--   Suggest potential improvements (e.g., hybrid models, enhanced data sources, or improved user interface).
-
--   Mention real-world applications or extensions of the system.
 
 We built a content-based filtering system that recommends movies based on their attributes rather than user interactions. Using TF-IDF vectorization, we transformed movie metadata into numerical representations and applied cosine similarity and linear kernel similarity to measure similarity. The model effectively finds movies with similar genres and cast but has some limitations such as inability to suggest nuanced recommendations. We also implemented a collaborative based filtering system that took into account movies that had gotten similar rating patterns by different users. The two models were then combined to create a hybrid cascade recommender system that could give well rounded and diverse recommendations for users based on a movie that they want recommendations for. To improve upon the model we created, we could include other content features like directors, producers, or use Natural Language Processing to analyze the movie summary or user reviews. We also could look into refining feature weights so that certain aspects are taken into account more than others, and also acquiring data about the user seeking recommendations so the system can offer a more personalized list of recommendations. Overall, these recommender systems effectively produce movie recommendations based on both content and user ratings, but improvements could be made for the future to offer more personalized and nuanced recommendations.
