@@ -47,7 +47,7 @@
         "\n",
         "#### Content-based filtering\n"
       ],
-      "id": "92b3d4b5"
+      "id": "4322f9ed"
     },
     {
       "cell_type": "code",
@@ -120,7 +120,7 @@
         "# Convert to DataFrame\n",
         "movie_content_df = pd.DataFrame(all_movies)"
       ],
-      "id": "172da120",
+      "id": "5de1c3b0",
       "execution_count": null,
       "outputs": []
     },
@@ -144,7 +144,7 @@
         "\n",
         "#### Collaborative-based filtering\n"
       ],
-      "id": "819dfbe4"
+      "id": "83cb1934"
     },
     {
       "cell_type": "code",
@@ -207,7 +207,7 @@
         "# Convert reviews to DataFrame\n",
         "movie_reviews_df = pd.DataFrame(reviews_data)"
       ],
-      "id": "a2e2bd92",
+      "id": "05741a12",
       "execution_count": null,
       "outputs": []
     },
@@ -231,7 +231,7 @@
         "\n",
         "### Content-based filtering\n"
       ],
-      "id": "51a1ca67"
+      "id": "dc23b917"
     },
     {
       "cell_type": "code",
@@ -266,7 +266,7 @@
         "else:\n",
         "    print(\"Error\", response.status_code)"
       ],
-      "id": "6172b791",
+      "id": "b0e84443",
       "execution_count": null,
       "outputs": []
     },
@@ -276,7 +276,7 @@
       "source": [
         "The first step in preprocessing the content-based data is to create a dictionary that maps the genre identification numbers to its corresponding genre category.\n"
       ],
-      "id": "7c4566c6"
+      "id": "b69ac98d"
     },
     {
       "cell_type": "code",
@@ -291,7 +291,7 @@
         "movies_df = pd.read_csv('../data/movies_data.csv')\n",
         "pd.options.mode.chained_assignment = None"
       ],
-      "id": "aa36cafe",
+      "id": "d43da359",
       "execution_count": null,
       "outputs": []
     },
@@ -323,9 +323,9 @@
         "      return dataframe\n",
         "    \n",
         "# Apply the preprocessing function\n",
-        "movie_content_df = preprocessing(movie_content_df)"
+        "movie_content_df = content_preprocessing(movie_content_df)"
       ],
-      "id": "31e252fc",
+      "id": "225d2623",
       "execution_count": null,
       "outputs": []
     },
@@ -335,7 +335,7 @@
       "source": [
         "The code chunk above applies the genre dictionary to extract genre categories. It also retains relevant columns in the DataFrame.\n"
       ],
-      "id": "8e5019d5"
+      "id": "338ab35f"
     },
     {
       "cell_type": "code",
@@ -403,7 +403,7 @@
         "  # Reorganize columns in the DataFrame\n",
         "movie_content_df = movie_content_df[new_column_order]"
       ],
-      "id": "befbb2ad",
+      "id": "373dd877",
       "execution_count": null,
       "outputs": []
     },
@@ -429,7 +429,7 @@
         "\n",
         "### Collaborative-based filtering\n"
       ],
-      "id": "9f91ce04"
+      "id": "d5514ee0"
     },
     {
       "cell_type": "code",
@@ -459,7 +459,7 @@
         "# Apply the preprocessing function\n",
         "movies_df = collab_preproccesing(movies_df)"
       ],
-      "id": "2c9b3892",
+      "id": "fdbb55d2",
       "execution_count": null,
       "outputs": []
     },
@@ -469,7 +469,7 @@
       "source": [
         "To begin for the collaborative based preprocessing, a similar pipeline to what was used for content based is followed. The genre ids are mapped to genres names and the relevant columns are retained.\n"
       ],
-      "id": "4806129d"
+      "id": "070dae21"
     },
     {
       "cell_type": "code",
@@ -504,7 +504,7 @@
         "# Drop the `author` column\n",
         "movie_reviews_df = movie_reviews_df.drop(columns=[\"author\"])"
       ],
-      "id": "9f2268e5",
+      "id": "1beab295",
       "execution_count": null,
       "outputs": []
     },
@@ -524,12 +524,14 @@
         "\n",
         "### Variables\n"
       ],
-      "id": "d4bfbac6"
+      "id": "df8dab34"
     },
     {
       "cell_type": "code",
       "metadata": {},
       "source": [
+        "import seaborn as sns\n",
+        "import matplotlib.pyplot as plt\n",
         "from rich.console import Console\n",
         "from rich.table import Table\n",
         "\n",
@@ -553,7 +555,7 @@
         "table.add_row('user_rating', 'Rating given by user.')\n",
         "console.print(table)"
       ],
-      "id": "0c977845",
+      "id": "a401cfbf",
       "execution_count": null,
       "outputs": []
     },
@@ -563,7 +565,7 @@
       "source": [
         "### Missing Data\n"
       ],
-      "id": "b3e8506e"
+      "id": "ef4b6eee"
     },
     {
       "cell_type": "code",
@@ -582,7 +584,7 @@
         "  plt.subplots_adjust(bottom = 0.25)\n",
         "  plt.show()"
       ],
-      "id": "411cd904",
+      "id": "0d95a943",
       "execution_count": null,
       "outputs": []
     },
@@ -592,7 +594,7 @@
       "source": [
         "The dataset `movie_content_df` is missing some observations in `genre_ids`, `cast_names`, and `watch_providers`. It appears that movies missing watch provider information are those that have been newly released.\n"
       ],
-      "id": "1f5ee565"
+      "id": "e910c227"
     },
     {
       "cell_type": "code",
@@ -607,7 +609,7 @@
         "plt.subplots_adjust(bottom = 0.25)\n",
         "plt.show()"
       ],
-      "id": "2e6db095",
+      "id": "f8718efb",
       "execution_count": null,
       "outputs": []
     },
@@ -619,7 +621,7 @@
         "\n",
         "#### Popular Genres\n"
       ],
-      "id": "4e06517d"
+      "id": "9da71f25"
     },
     {
       "cell_type": "code",
@@ -641,7 +643,7 @@
         "plt.subplots_adjust(bottom = .25)\n",
         "plt.show()"
       ],
-      "id": "4415c81e",
+      "id": "80bb09c0",
       "execution_count": null,
       "outputs": []
     },
@@ -653,7 +655,7 @@
         "\n",
         "#### Popular Movie Languages\n"
       ],
-      "id": "8f1be32a"
+      "id": "9984b12b"
     },
     {
       "cell_type": "code",
@@ -668,7 +670,7 @@
         "plt.subplots_adjust(left = .25)\n",
         "plt.show()"
       ],
-      "id": "0a5a486b",
+      "id": "680c50a1",
       "execution_count": null,
       "outputs": []
     },
@@ -680,7 +682,7 @@
         "\n",
         "#### Popular Actors\n"
       ],
-      "id": "31dae2f9"
+      "id": "96f19e01"
     },
     {
       "cell_type": "code",
@@ -701,7 +703,7 @@
         "plt.subplots_adjust(left = .3)\n",
         "plt.show()"
       ],
-      "id": "e17acb84",
+      "id": "34043bb0",
       "execution_count": null,
       "outputs": []
     },
@@ -713,7 +715,7 @@
         "\n",
         "#### Providers\n"
       ],
-      "id": "a16fcf3a"
+      "id": "17e494c4"
     },
     {
       "cell_type": "code",
@@ -734,7 +736,7 @@
         "plt.subplots_adjust(left=0.4)\n",
         "plt.show()"
       ],
-      "id": "2f4a8f33",
+      "id": "7ca3f179",
       "execution_count": null,
       "outputs": []
     },
@@ -746,7 +748,7 @@
         "\n",
         "#### Reviewers\n"
       ],
-      "id": "2846a4a5"
+      "id": "25bb02a9"
     },
     {
       "cell_type": "code",
@@ -764,7 +766,7 @@
         "plt.subplots_adjust(left=0.4)\n",
         "plt.show()"
       ],
-      "id": "6b3c1bc2",
+      "id": "3f09a676",
       "execution_count": null,
       "outputs": []
     },
@@ -787,7 +789,7 @@
         "-   Apply TF-IDF vectorization to convert text into numerical vectors\n",
         "-   Compute cosine similarity to measure the pairwise similarity between movies\n"
       ],
-      "id": "430429af"
+      "id": "7ba861ec"
     },
     {
       "cell_type": "code",
@@ -802,7 +804,7 @@
         "\n",
         "movie_content_df = pd.read_csv(file_path)"
       ],
-      "id": "b636b30d",
+      "id": "c82c6909",
       "execution_count": null,
       "outputs": []
     },
@@ -829,7 +831,7 @@
         "print(\"Cosine Similarity Matrix Shape:\", cosine_sim.shape)\n",
         "print(\"Sample Cosine Similarity Scores:\\n\", cosine_sim[:5, :5])"
       ],
-      "id": "4f7db572",
+      "id": "9a4b68a6",
       "execution_count": null,
       "outputs": []
     },
@@ -843,7 +845,7 @@
         "-   Normalize numeric features and concatenate them with TF-IDF vectors\n",
         "-   Compute linear kernel similarity\n"
       ],
-      "id": "ac9948bc"
+      "id": "0a76219b"
     },
     {
       "cell_type": "code",
@@ -878,7 +880,7 @@
         "print(\"Linear Kernel Similarity Matrix Shape:\", linear_sim.shape)\n",
         "print(\"Sample Linear Kernel Similarity Scores:\\n\", linear_sim[:5, :5])"
       ],
-      "id": "964c7648",
+      "id": "8d152a64",
       "execution_count": null,
       "outputs": []
     },
@@ -895,7 +897,7 @@
         "    -   **Cosine Similarity (text only)**\n",
         "    -   **Linear Kernel Similarity (text + numeric)**\n"
       ],
-      "id": "32a33f19"
+      "id": "e0d97860"
     },
     {
       "cell_type": "code",
@@ -945,7 +947,7 @@
         "\n",
         "    return recommendations"
       ],
-      "id": "51b424c7",
+      "id": "a3049111",
       "execution_count": null,
       "outputs": []
     },
@@ -956,7 +958,7 @@
         "recommendations1 = content_based_movie_recs(\"The Gorgee\", movie_content_df, cosine_sim)\n",
         "recommendations2 = content_based_movie_recs(\"Paprika\", movie_content_df, cosine_sim)"
       ],
-      "id": "bf0ecf2d",
+      "id": "adc0a817",
       "execution_count": null,
       "outputs": []
     },
@@ -1006,7 +1008,7 @@
         "\n",
         "    return recommendations"
       ],
-      "id": "62ec47e0",
+      "id": "fb7891eb",
       "execution_count": null,
       "outputs": []
     },
@@ -1017,7 +1019,7 @@
         "recommended_movies_linear1 = content_based_movie_recs_linear(\"The Gorgee\", movie_content_df, linear_sim)\n",
         "recommended_movies_linear2 = content_based_movie_recs_linear(\"paprika\", movie_content_df, linear_sim)"
       ],
-      "id": "81ca1897",
+      "id": "b97473ac",
       "execution_count": null,
       "outputs": []
     },
@@ -1052,7 +1054,7 @@
         "\n",
         "-   Prints the information for the user\n"
       ],
-      "id": "05677dd0"
+      "id": "2d31176b"
     },
     {
       "cell_type": "code",
@@ -1066,7 +1068,7 @@
         "movies_df = pd.read_csv('../data/movies_data.csv')\n",
         "pd.options.mode.chained_assignment = None"
       ],
-      "id": "9cbab9fc",
+      "id": "de35d738",
       "execution_count": null,
       "outputs": []
     },
@@ -1087,7 +1089,7 @@
         "knn = NearestNeighbors(metric = \"cosine\", algorithm = \"brute\")\n",
         "knn.fit(movies_matrix)"
       ],
-      "id": "d7118538",
+      "id": "95f1b908",
       "execution_count": null,
       "outputs": []
     },
@@ -1097,7 +1099,7 @@
       "source": [
         "The code above executes steps one and two of the collaborative recommendation. It prepares the data to be fit by a K Nearest Neighbors model by transforming it into a CSR user-item matrix, and then proceeds to fit the model.\n"
       ],
-      "id": "df95cd24"
+      "id": "f4c66836"
     },
     {
       "cell_type": "code",
@@ -1156,7 +1158,7 @@
         "        print(f\"   📺 Where to stream: {watch_providers}\")\n",
         "        print()"
       ],
-      "id": "8de634cc",
+      "id": "80d4b392",
       "execution_count": null,
       "outputs": []
     },
@@ -1166,7 +1168,7 @@
       "source": [
         "The function above takes in a movie title, and prints out the top 10 movies that are most similar to that input movie based on user rating patterns. Let's try out this function on the best picture winner from this years Oscars.\n"
       ],
-      "id": "f8c52642"
+      "id": "faa22845"
     },
     {
       "cell_type": "code",
@@ -1174,7 +1176,7 @@
       "source": [
         "collaborative_based_movie_recs('Anora', movies_pivot, movies_merged, knn, num_recs=10)"
       ],
-      "id": "d19a6e4e",
+      "id": "e883c66e",
       "execution_count": null,
       "outputs": []
     },
@@ -1208,7 +1210,7 @@
         "\n",
         "-   Display the top 10 content based movie recommendations for the user\n"
       ],
-      "id": "9805b309"
+      "id": "b4cd02c2"
     },
     {
       "cell_type": "code",
@@ -1296,7 +1298,7 @@
         "    \n",
         "    return final_recommendations"
       ],
-      "id": "cca5cbbd",
+      "id": "94808c2b",
       "execution_count": null,
       "outputs": []
     },
@@ -1306,7 +1308,7 @@
       "source": [
         "The function defined above will retrieve the final top 10 movie recommendations for a given movie, based on content and reviews if that data is present. Let's see what results we get for the same movie as before.\n"
       ],
-      "id": "a31f96a0"
+      "id": "d6f4fe33"
     },
     {
       "cell_type": "code",
@@ -1314,7 +1316,7 @@
       "source": [
         "final_movie_recs(\"Anora\")"
       ],
-      "id": "436c1a05",
+      "id": "12461df2",
       "execution_count": null,
       "outputs": []
     },
@@ -1346,14 +1348,15 @@
         "\n",
         "We built a content-based filtering system that recommends movies based on their attributes rather than user interactions. Using TF-IDF vectorization, we transformed movie metadata into numerical representations and applied cosine similarity and linear kernel similarity to measure similarity. The model effectively finds movies with similar genres and cast but has some limitations such as inability to suggest nuanced recommendations. We also implemented a collaborative based filtering system that took into account movies that had gotten similar rating patterns by different users. The two models were then combined to create a hybrid cascade recommender system that could give well rounded and diverse recommendations for users based on a movie that they want recommendations for. To improve upon the model we created, we could include other content features like directors, producers, or use Natural Language Processing to analyze the movie summary or user reviews. We also could look into refining feature weights so that certain aspects are taken into account more than others, and also acquiring data about the user seeking recommendations so the system can offer a more personalized list of recommendations. Overall, these recommender systems effectively produce movie recommendations based on both content and user ratings, but improvements could be made for the future to offer more personalized and nuanced recommendations."
       ],
-      "id": "a94e39d5"
+      "id": "b9d003b5"
     }
   ],
   "metadata": {
     "kernelspec": {
-      "display_name": "Python 3",
+      "name": "python3",
       "language": "python",
-      "name": "python3"
+      "display_name": "Python 3 (ipykernel)",
+      "path": "/Users/valeriedelafuente/.virtualenvs/r-reticulate/share/jupyter/kernels/python3"
     }
   },
   "nbformat": 4,
