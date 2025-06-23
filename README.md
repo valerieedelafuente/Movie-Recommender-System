@@ -68,7 +68,7 @@ By combining **content-based filtering** with **collaborative filtering**, we cr
 
 The system successfully provides high-quality recommendations even in the presence of missing review data. The hybrid cascade approach improves personalization while mitigating cold-start issues.
 
-📝 Full project report:  
+Full project report:  
 - [HTML Overview](results/Movie%20Recommender%20System%20Project%20Overview.html)  
 - [PDF Report](results/Movie%20Recommender%20System%20Project.pdf)
 
