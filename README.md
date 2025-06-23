@@ -48,23 +48,23 @@ By combining **content-based filtering** with **collaborative filtering**, we cr
 
 ## 🔧 Methods
 
-### 🗃️ Data Collection
+### Data Collection
 - Retrieved ~4,000 movies and ~9,600 user reviews from TMDb using API requests.
 - Gathered metadata: genre, cast, release year, watch providers, language, etc.
 
-### 🧹 Data Cleaning
+### Data Cleaning
 - Converted genre IDs and language codes into readable formats.
 - Created `release_year` column and normalized rating scales.
 - Handled missing values and standardized column types.
 
-### 🎯 Recommendation System
+### Recommendation System
 - **Content-Based**: Filters movies based on user interests and movie features.
 - **Collaborative**: Matches user preferences using review patterns and ratings.
 - **Cascade Hybrid**: Uses content filtering to narrow candidates, then ranks with collaborative filtering.
 
 ---
 
-## 📊 Results
+## Results
 
 The system successfully provides high-quality recommendations even in the presence of missing review data. The hybrid cascade approach improves personalization while mitigating cold-start issues.
 
@@ -74,7 +74,7 @@ The system successfully provides high-quality recommendations even in the presen
 
 ---
 
-## 💻 Technologies Used
+## Technologies Used
 
 - Python (Pandas, NumPy, Scikit-learn, Requests)
 - TMDb API
@@ -83,7 +83,7 @@ The system successfully provides high-quality recommendations even in the presen
 
 ---
 
-## 👩‍💻 Authors
+## Authors
 
 - Valerie De La Fuente (@valerieedelafuente)
 - Jiajia Feng (@JiajiaFeng18)
