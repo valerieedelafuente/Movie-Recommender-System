@@ -78,7 +78,7 @@ Full project report:
 
 - Python (Pandas, NumPy, Scikit-learn, Requests)
 - TMDb API
-- Quarto / Jupyter
+- Quarto
 - Git & GitHub
 
 ---
